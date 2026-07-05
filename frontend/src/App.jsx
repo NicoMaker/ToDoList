@@ -2,13 +2,17 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { api } from './api';
 
 const PRIORITIES = [
-  { value: 'alta', label: 'Alta', color: '#ef4444' },
-  { value: 'media', label: 'Media', color: '#f59e0b' },
-  { value: 'bassa', label: 'Bassa', color: '#10b981' },
+  { value: 'alta', label: 'Alta', color: '#a6392c' },
+  { value: 'media', label: 'Media', color: '#b9832e' },
+  { value: 'bassa', label: 'Bassa', color: '#5f7a52' },
 ];
 
 function priorityMeta(value) {
   return PRIORITIES.find((p) => p.value === value) || PRIORITIES[1];
+}
+
+function caseNumber(id) {
+  return `N. ${String(id).padStart(3, '0')}`;
 }
 
 export default function App() {
@@ -125,167 +129,195 @@ export default function App() {
 
   return (
     <div className="app">
-      <div className="container">
-        <header className="header">
-          <h1>✅ Todo List</h1>
-          <p className="subtitle">Gestisci le tue attività — React + Express + SQLite</p>
-        </header>
+      <header className="masthead">
+        <h1 className="masthead-title">
+          Il <span className="mark">Docket</span>
+        </h1>
+        <span className="masthead-sub">Registro delle pratiche aperte</span>
+      </header>
 
-        <form className="add-form" onSubmit={handleCreate}>
-          <input
-            type="text"
-            placeholder="Cosa devi fare?"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="input-title"
-          />
-          <input
-            type="text"
-            placeholder="Descrizione (opzionale)"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="input-desc"
-          />
-          <div className="form-row">
-            <select value={priority} onChange={(e) => setPriority(e.target.value)}>
-              {PRIORITIES.map((p) => (
-                <option key={p.value} value={p.value}>
-                  Priorità: {p.label}
-                </option>
-              ))}
-            </select>
-            <button type="submit" className="btn btn-primary">
-              + Aggiungi
-            </button>
-          </div>
-        </form>
-
-        <div className="toolbar">
-          <input
-            type="text"
-            placeholder="🔍 Cerca..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="input-search"
-          />
-          <div className="filters">
-            {['tutti', 'attivi', 'completati'].map((f) => (
-              <button
-                key={f}
-                className={`filter-btn ${filter === f ? 'active' : ''}`}
-                onClick={() => setFilter(f)}
-              >
-                {f.charAt(0).toUpperCase() + f.slice(1)}
+      <div className="board">
+        {/* ---- Colonna laterale: nuova pratica + statistiche ---- */}
+        <aside className="side-panel">
+          <div className="panel-card">
+            <span className="panel-label">Apri nuova pratica</span>
+            <form className="add-form" onSubmit={handleCreate}>
+              <input
+                type="text"
+                placeholder="Cosa devi fare?"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+              <input
+                type="text"
+                placeholder="Descrizione (opzionale)"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+              <select value={priority} onChange={(e) => setPriority(e.target.value)}>
+                {PRIORITIES.map((p) => (
+                  <option key={p.value} value={p.value}>
+                    Priorità: {p.label}
+                  </option>
+                ))}
+              </select>
+              <button type="submit" className="btn btn-primary">
+                + Registra pratica
               </button>
-            ))}
+            </form>
           </div>
-        </div>
 
-        <div className="stats">
-          <span>{activeCount} da fare</span>
-          <span>{completedCount} completati</span>
-          {completedCount > 0 && (
-            <button className="btn-link" onClick={handleClearCompleted}>
-              Elimina completati
-            </button>
-          )}
-        </div>
+          <div className="panel-card">
+            <span className="panel-label">Riepilogo</span>
+            <div className="stats-grid">
+              <div className="stat">
+                <span className="stat-num">{activeCount}</span>
+                <span className="stat-label">Da fare</span>
+              </div>
+              <div className="stat">
+                <span className="stat-num">{completedCount}</span>
+                <span className="stat-label">Evase</span>
+              </div>
+            </div>
+            {completedCount > 0 && (
+              <div className="clear-completed-row">
+                <button className="btn-link" onClick={handleClearCompleted}>
+                  Archivia ed elimina le evase
+                </button>
+              </div>
+            )}
+          </div>
+        </aside>
 
-        {error && <div className="error-banner">⚠️ {error}</div>}
+        {/* ---- Colonna principale: il docket ---- */}
+        <main className="docket">
+          <div className="toolbar">
+            <input
+              type="text"
+              placeholder="Cerca nel docket..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="input-search"
+            />
+            <div className="filters">
+              {['tutti', 'attivi', 'completati'].map((f) => (
+                <button
+                  key={f}
+                  className={`filter-btn ${filter === f ? 'active' : ''}`}
+                  onClick={() => setFilter(f)}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
+          </div>
 
-        <div className="todo-list">
-          {loading && <p className="empty-state">Caricamento...</p>}
-          {!loading && todos.length === 0 && (
-            <p className="empty-state">Nessuna attività trovata. Aggiungine una! 🎉</p>
-          )}
+          {error && <div className="error-banner">Attenzione — {error}</div>}
 
-          {!loading &&
-            todos.map((todo) => {
-              const meta = priorityMeta(todo.priority);
-              const isEditing = editingId === todo.id;
+          <div className="todo-list">
+            {loading && <p className="empty-state">Consultazione del registro in corso...</p>}
+            {!loading && todos.length === 0 && (
+              <p className="empty-state">Il docket è vuoto. Registra la prima pratica.</p>
+            )}
 
-              return (
-                <div key={todo.id} className={`todo-card ${todo.completed ? 'completed' : ''}`}>
-                  {isEditing ? (
-                    <div className="edit-mode">
-                      <input
-                        type="text"
-                        value={editTitle}
-                        onChange={(e) => setEditTitle(e.target.value)}
-                        className="input-title"
-                        autoFocus
-                      />
-                      <input
-                        type="text"
-                        value={editDescription}
-                        onChange={(e) => setEditDescription(e.target.value)}
-                        className="input-desc"
-                        placeholder="Descrizione"
-                      />
-                      <div className="form-row">
-                        <select
-                          value={editPriority}
-                          onChange={(e) => setEditPriority(e.target.value)}
-                        >
-                          {PRIORITIES.map((p) => (
-                            <option key={p.value} value={p.value}>
-                              {p.label}
-                            </option>
-                          ))}
-                        </select>
-                        <button className="btn btn-primary" onClick={() => saveEdit(todo.id)}>
-                          Salva
-                        </button>
-                        <button className="btn btn-ghost" onClick={cancelEdit}>
-                          Annulla
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="todo-main">
+            {!loading &&
+              todos.map((todo) => {
+                const meta = priorityMeta(todo.priority);
+                const isEditing = editingId === todo.id;
+
+                return (
+                  <div key={todo.id} className={`todo-card ${todo.completed ? 'completed' : ''}`}>
+                    {todo.completed && <span className="stamp-evaso">EVASO</span>}
+
+                    {isEditing ? (
+                      <div className="edit-mode">
                         <input
-                          type="checkbox"
-                          checked={!!todo.completed}
-                          onChange={() => handleToggle(todo.id)}
-                          className="checkbox"
+                          type="text"
+                          value={editTitle}
+                          onChange={(e) => setEditTitle(e.target.value)}
+                          autoFocus
                         />
-                        <div className="todo-text">
-                          <div className="todo-title-row">
-                            <span className="todo-title">{todo.title}</span>
-                            <span
-                              className="priority-badge"
-                              style={{ backgroundColor: meta.color }}
-                            >
-                              {meta.label}
-                            </span>
-                          </div>
-                          {todo.description && (
-                            <p className="todo-description">{todo.description}</p>
-                          )}
-                          <span className="todo-date">
-                            {new Date(todo.created_at).toLocaleString('it-IT')}
-                          </span>
+                        <input
+                          type="text"
+                          value={editDescription}
+                          onChange={(e) => setEditDescription(e.target.value)}
+                          placeholder="Descrizione"
+                        />
+                        <div className="form-row">
+                          <select
+                            value={editPriority}
+                            onChange={(e) => setEditPriority(e.target.value)}
+                          >
+                            {PRIORITIES.map((p) => (
+                              <option key={p.value} value={p.value}>
+                                {p.label}
+                              </option>
+                            ))}
+                          </select>
+                          <button className="btn btn-primary" onClick={() => saveEdit(todo.id)}>
+                            Salva
+                          </button>
+                          <button className="btn btn-ghost" onClick={cancelEdit}>
+                            Annulla
+                          </button>
                         </div>
                       </div>
-                      <div className="todo-actions">
-                        <button className="icon-btn" onClick={() => startEdit(todo)} title="Modifica">
-                          ✏️
-                        </button>
-                        <button
-                          className="icon-btn delete"
-                          onClick={() => handleDelete(todo.id)}
-                          title="Elimina"
-                        >
-                          🗑️
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              );
-            })}
-        </div>
+                    ) : (
+                      <>
+                        <div className="todo-main">
+                          <div className="checkbox-wrap">
+                            <input
+                              type="checkbox"
+                              checked={!!todo.completed}
+                              onChange={() => handleToggle(todo.id)}
+                              className="checkbox"
+                              aria-label="Segna come evasa"
+                            />
+                          </div>
+                          <div className="todo-text">
+                            <span className="case-number">{caseNumber(todo.id)}</span>
+                            <div className="todo-title-row">
+                              <span className="todo-title">{todo.title}</span>
+                              <span
+                                className="priority-seal"
+                                style={{ backgroundColor: meta.color }}
+                              >
+                                {meta.label}
+                              </span>
+                            </div>
+                            {todo.description && (
+                              <p className="todo-description">{todo.description}</p>
+                            )}
+                            <span className="todo-date">
+                              Aperta il {new Date(todo.created_at).toLocaleString('it-IT')}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="todo-actions">
+                          <button
+                            className="icon-btn"
+                            onClick={() => startEdit(todo)}
+                            title="Modifica pratica"
+                            aria-label="Modifica"
+                          >
+                            ✎
+                          </button>
+                          <button
+                            className="icon-btn"
+                            onClick={() => handleDelete(todo.id)}
+                            title="Elimina pratica"
+                            aria-label="Elimina"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+          </div>
+        </main>
       </div>
     </div>
   );
