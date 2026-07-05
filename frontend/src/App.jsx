@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { api } from './api';
+import React, { useState, useEffect, useCallback } from "react";
+import { api } from "./api";
 
 const PRIORITIES = [
-  { value: 'alta', label: 'Alta', color: '#a6392c' },
-  { value: 'media', label: 'Media', color: '#b9832e' },
-  { value: 'bassa', label: 'Bassa', color: '#5f7a52' },
+  { value: "alta", label: "Alta", color: "#a6392c" },
+  { value: "media", label: "Media", color: "#b9832e" },
+  { value: "bassa", label: "Bassa", color: "#5f7a52" },
 ];
 
 function priorityMeta(value) {
@@ -12,33 +12,33 @@ function priorityMeta(value) {
 }
 
 function caseNumber(id) {
-  return `N. ${String(id).padStart(3, '0')}`;
+  return `N. ${String(id).padStart(3, "0")}`;
 }
 
 export default function App() {
   const [todos, setTodos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [priority, setPriority] = useState('media');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [priority, setPriority] = useState("media");
 
-  const [filter, setFilter] = useState('tutti'); // tutti | attivi | completati
-  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState("tutti"); // tutti | attivi | completati
+  const [search, setSearch] = useState("");
 
   const [editingId, setEditingId] = useState(null);
-  const [editTitle, setEditTitle] = useState('');
-  const [editDescription, setEditDescription] = useState('');
-  const [editPriority, setEditPriority] = useState('media');
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editPriority, setEditPriority] = useState("media");
 
   const loadTodos = useCallback(async () => {
     setLoading(true);
-    setError('');
+    setError("");
     try {
       const params = {};
-      if (filter === 'attivi') params.completed = 'false';
-      if (filter === 'completati') params.completed = 'true';
+      if (filter === "attivi") params.completed = "false";
+      if (filter === "completati") params.completed = "true";
       if (search.trim()) params.search = search.trim();
       const data = await api.getAll(params);
       setTodos(data);
@@ -59,9 +59,9 @@ export default function App() {
     if (!title.trim()) return;
     try {
       await api.create({ title, description, priority });
-      setTitle('');
-      setDescription('');
-      setPriority('media');
+      setTitle("");
+      setDescription("");
+      setPriority("media");
       loadTodos();
     } catch (e) {
       setError(e.message);
@@ -89,15 +89,15 @@ export default function App() {
   const startEdit = (todo) => {
     setEditingId(todo.id);
     setEditTitle(todo.title);
-    setEditDescription(todo.description || '');
-    setEditPriority(todo.priority || 'media');
+    setEditDescription(todo.description || "");
+    setEditPriority(todo.priority || "media");
   };
 
   const cancelEdit = () => {
     setEditingId(null);
-    setEditTitle('');
-    setEditDescription('');
-    setEditPriority('media');
+    setEditTitle("");
+    setEditDescription("");
+    setEditPriority("media");
   };
 
   const saveEdit = async (id) => {
@@ -154,7 +154,10 @@ export default function App() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
-              <select value={priority} onChange={(e) => setPriority(e.target.value)}>
+              <select
+                value={priority}
+                onChange={(e) => setPriority(e.target.value)}
+              >
                 {PRIORITIES.map((p) => (
                   <option key={p.value} value={p.value}>
                     Priorità: {p.label}
@@ -200,10 +203,10 @@ export default function App() {
               className="input-search"
             />
             <div className="filters">
-              {['tutti', 'attivi', 'completati'].map((f) => (
+              {["tutti", "attivi", "completati"].map((f) => (
                 <button
                   key={f}
-                  className={`filter-btn ${filter === f ? 'active' : ''}`}
+                  className={`filter-btn ${filter === f ? "active" : ""}`}
                   onClick={() => setFilter(f)}
                 >
                   {f}
@@ -215,9 +218,15 @@ export default function App() {
           {error && <div className="error-banner">Attenzione — {error}</div>}
 
           <div className="todo-list">
-            {loading && <p className="empty-state">Consultazione del registro in corso...</p>}
+            {loading && (
+              <p className="empty-state">
+                Consultazione del registro in corso...
+              </p>
+            )}
             {!loading && todos.length === 0 && (
-              <p className="empty-state">Il docket è vuoto. Registra la prima pratica.</p>
+              <p className="empty-state">
+                Il docket è vuoto. Registra la prima pratica.
+              </p>
             )}
 
             {!loading &&
@@ -226,8 +235,13 @@ export default function App() {
                 const isEditing = editingId === todo.id;
 
                 return (
-                  <div key={todo.id} className={`todo-card ${todo.completed ? 'completed' : ''}`}>
-                    {todo.completed && <span className="stamp-evaso">EVASO</span>}
+                  <div
+                    key={todo.id}
+                    className={`todo-card ${todo.completed ? "completed" : ""}`}
+                  >
+                    {todo.completed && (
+                      <span className="stamp-evaso">EVASO</span>
+                    )}
 
                     {isEditing ? (
                       <div className="edit-mode">
@@ -254,10 +268,16 @@ export default function App() {
                               </option>
                             ))}
                           </select>
-                          <button className="btn btn-primary" onClick={() => saveEdit(todo.id)}>
+                          <button
+                            className="btn btn-primary"
+                            onClick={() => saveEdit(todo.id)}
+                          >
                             Salva
                           </button>
-                          <button className="btn btn-ghost" onClick={cancelEdit}>
+                          <button
+                            className="btn btn-ghost"
+                            onClick={cancelEdit}
+                          >
                             Annulla
                           </button>
                         </div>
@@ -275,7 +295,9 @@ export default function App() {
                             />
                           </div>
                           <div className="todo-text">
-                            <span className="case-number">{caseNumber(todo.id)}</span>
+                            <span className="case-number">
+                              {caseNumber(todo.id)}
+                            </span>
                             <div className="todo-title-row">
                               <span className="todo-title">{todo.title}</span>
                               <span
@@ -286,10 +308,15 @@ export default function App() {
                               </span>
                             </div>
                             {todo.description && (
-                              <p className="todo-description">{todo.description}</p>
+                              <p className="todo-description">
+                                {todo.description}
+                              </p>
                             )}
                             <span className="todo-date">
-                              Aperta il {new Date(todo.created_at).toLocaleString('it-IT')}
+                              Aperta il{" "}
+                              {new Date(todo.created_at).toLocaleString(
+                                "it-IT",
+                              )}
                             </span>
                           </div>
                         </div>

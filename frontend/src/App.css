@@ -31,7 +31,8 @@
   --amber: #b9832e;
 
   --radius-card: 3px;
-  --shadow-card: 0 6px 16px rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.03) inset;
+  --shadow-card:
+    0 6px 16px rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.03) inset;
 }
 
 html {
@@ -39,16 +40,26 @@ html {
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
   background:
-    radial-gradient(ellipse 900px 400px at 50% -10%, rgba(201, 161, 90, 0.12), transparent 60%),
+    radial-gradient(
+      ellipse 900px 400px at 50% -10%,
+      rgba(201, 161, 90, 0.12),
+      transparent 60%
+    ),
     var(--desk);
   min-height: 100vh;
   color: var(--on-dark);
   -webkit-font-smoothing: antialiased;
 }
 
-button, input, select {
+button,
+input,
+select {
   font-family: inherit;
 }
 
@@ -82,7 +93,7 @@ button, input, select {
 }
 
 .masthead-title {
-  font-family: 'Fraunces', serif;
+  font-family: "Fraunces", serif;
   font-weight: 600;
   font-size: clamp(1.7rem, 3.2vw, 2.4rem);
   letter-spacing: -0.01em;
@@ -99,7 +110,7 @@ button, input, select {
 }
 
 .masthead-sub {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: "IBM Plex Mono", monospace;
   font-size: 0.78rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -145,7 +156,7 @@ button, input, select {
 }
 
 .panel-label {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: "IBM Plex Mono", monospace;
   font-size: 0.68rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -160,7 +171,8 @@ button, input, select {
   gap: 10px;
 }
 
-input, select {
+input,
+select {
   font-size: 0.92rem;
   color: var(--ink);
   background: var(--paper);
@@ -168,7 +180,9 @@ input, select {
   border-radius: 2px;
   padding: 11px 12px;
   outline: none;
-  transition: box-shadow 0.15s, border-color 0.15s;
+  transition:
+    box-shadow 0.15s,
+    border-color 0.15s;
 }
 
 input::placeholder {
@@ -176,7 +190,8 @@ input::placeholder {
   opacity: 0.7;
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
   border-color: var(--brass);
   box-shadow: 0 0 0 3px rgba(201, 161, 90, 0.2);
 }
@@ -202,9 +217,12 @@ select {
   font-size: 0.86rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.08s, filter 0.15s, opacity 0.15s;
+  transition:
+    transform 0.08s,
+    filter 0.15s,
+    opacity 0.15s;
   white-space: nowrap;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 .btn:active {
@@ -258,7 +276,7 @@ select {
 }
 
 .stat-num {
-  font-family: 'Fraunces', serif;
+  font-family: "Fraunces", serif;
   font-size: 1.7rem;
   font-weight: 600;
   color: var(--brass-bright);
@@ -267,7 +285,7 @@ select {
 }
 
 .stat-label {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: "IBM Plex Mono", monospace;
   font-size: 0.62rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -324,7 +342,7 @@ select {
   font-size: 0.82rem;
   white-space: nowrap;
   transition: all 0.15s;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: "IBM Plex Mono", monospace;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -343,14 +361,14 @@ select {
   border-radius: 2px;
   margin-bottom: 14px;
   font-size: 0.85rem;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: "IBM Plex Mono", monospace;
 }
 
 .empty-state {
   text-align: center;
   color: var(--on-dark-muted);
   padding: 60px 20px;
-  font-family: 'Fraunces', serif;
+  font-family: "Fraunces", serif;
   font-style: italic;
   font-size: 1.1rem;
   border: 1px dashed var(--desk-line);
@@ -377,13 +395,15 @@ select {
   align-items: flex-start;
   gap: 12px;
   overflow: hidden;
-  transition: opacity 0.2s, transform 0.2s;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
 }
 
 /* tacche stile biglietto ai lati */
 .todo-card::before,
 .todo-card::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   width: 18px;
@@ -415,7 +435,7 @@ select {
   position: absolute;
   top: 8px;
   right: 26px;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: "IBM Plex Mono", monospace;
   font-weight: 600;
   font-size: 1.05rem;
   letter-spacing: 0.15em;
@@ -431,7 +451,7 @@ select {
 }
 
 .case-number {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: "IBM Plex Mono", monospace;
   font-size: 0.68rem;
   letter-spacing: 0.08em;
   color: var(--brass);
@@ -465,7 +485,7 @@ select {
 }
 
 .checkbox::before {
-  content: '';
+  content: "";
   width: 9px;
   height: 9px;
   border-radius: 50%;
@@ -495,7 +515,7 @@ select {
 }
 
 .todo-title {
-  font-family: 'Fraunces', serif;
+  font-family: "Fraunces", serif;
   font-weight: 600;
   font-size: 1.08rem;
   word-break: break-word;
@@ -503,7 +523,7 @@ select {
 }
 
 .priority-seal {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: "IBM Plex Mono", monospace;
   font-size: 0.62rem;
   font-weight: 600;
   padding: 3px 9px 3px 9px;
@@ -512,7 +532,7 @@ select {
   text-transform: uppercase;
   letter-spacing: 0.06em;
   flex-shrink: 0;
-  border: 1px solid rgba(0,0,0,0.15);
+  border: 1px solid rgba(0, 0, 0, 0.15);
 }
 
 .todo-description {
@@ -525,7 +545,7 @@ select {
 
 .todo-date {
   color: var(--ink-soft);
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: "IBM Plex Mono", monospace;
   font-size: 0.68rem;
   display: block;
   margin-top: 8px;
@@ -562,7 +582,8 @@ select {
   width: 100%;
 }
 
-.edit-mode input, .edit-mode select {
+.edit-mode input,
+.edit-mode select {
   background: var(--paper-shade);
 }
 

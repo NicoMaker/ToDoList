@@ -30,15 +30,15 @@ Il server parte su **http://localhost:3001**. Il database `todos.db` viene creat
 
 ### API disponibili
 
-| Metodo | Endpoint                          | Descrizione                          |
-|--------|------------------------------------|---------------------------------------|
-| GET    | `/api/todos`                      | Lista todo (filtri: `completed`, `priority`, `search`) |
-| GET    | `/api/todos/:id`                  | Dettaglio singolo todo               |
-| POST   | `/api/todos`                      | Crea nuovo todo                      |
-| PUT    | `/api/todos/:id`                  | Modifica un todo esistente           |
-| PATCH  | `/api/todos/:id/toggle`           | Alterna completato/non completato    |
-| DELETE | `/api/todos/:id`                  | Elimina un todo                      |
-| DELETE | `/api/todos/clear/completed`      | Elimina tutti i todo completati      |
+| Metodo | Endpoint                     | Descrizione                                            |
+| ------ | ---------------------------- | ------------------------------------------------------ |
+| GET    | `/api/todos`                 | Lista todo (filtri: `completed`, `priority`, `search`) |
+| GET    | `/api/todos/:id`             | Dettaglio singolo todo                                 |
+| POST   | `/api/todos`                 | Crea nuovo todo                                        |
+| PUT    | `/api/todos/:id`             | Modifica un todo esistente                             |
+| PATCH  | `/api/todos/:id/toggle`      | Alterna completato/non completato                      |
+| DELETE | `/api/todos/:id`             | Elimina un todo                                        |
+| DELETE | `/api/todos/clear/completed` | Elimina tutti i todo completati                        |
 
 ## Come avviare il frontend
 
