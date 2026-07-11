@@ -2,17 +2,99 @@ import React, { useState, useEffect, useCallback } from "react";
 import { api } from "./api";
 
 const PRIORITIES = [
-  { value: "alta", label: "Alta", color: "#a6392c" },
-  { value: "media", label: "Media", color: "#b9832e" },
-  { value: "bassa", label: "Bassa", color: "#5f7a52" },
+  { value: "alta", label: "Alta" },
+  { value: "media", label: "Media" },
+  { value: "bassa", label: "Bassa" },
 ];
 
-function priorityMeta(value) {
-  return PRIORITIES.find((p) => p.value === value) || PRIORITIES[1];
+function todayLabel() {
+  const s = new Date().toLocaleDateString("it-IT", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-function caseNumber(id) {
-  return `N. ${String(id).padStart(3, "0")}`;
+/* ---- Icone SVG ---- */
+const IconCheck = () => (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M5 12.5l4.5 4.5L19 7.5"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+const IconEdit = () => (
+  <svg viewBox="0 0 24 24" fill="none" width="16" height="16" aria-hidden="true">
+    <path
+      d="M16.5 4.5l3 3L8 19l-4 1 1-4L16.5 4.5z"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+const IconTrash = () => (
+  <svg viewBox="0 0 24 24" fill="none" width="16" height="16" aria-hidden="true">
+    <path
+      d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+const IconSearch = () => (
+  <svg viewBox="0 0 24 24" fill="none" width="17" height="17" aria-hidden="true">
+    <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
+    <path
+      d="M21 21l-4.3-4.3"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+const IconPlus = () => (
+  <svg viewBox="0 0 24 24" fill="none" width="18" height="18" aria-hidden="true">
+    <path
+      d="M12 5v14M5 12h14"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
+/* ---- Anello di avanzamento ---- */
+function ProgressRing({ done, total }) {
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  const R = 34;
+  const C = 2 * Math.PI * R;
+  return (
+    <div className="progress-ring" role="img" aria-label={`${pct}% completato`}>
+      <svg viewBox="0 0 84 84">
+        <circle className="ring-track" cx="42" cy="42" r={R} />
+        <circle
+          className="ring-value"
+          cx="42"
+          cy="42"
+          r={R}
+          strokeDasharray={C}
+          strokeDashoffset={C - (C * pct) / 100}
+        />
+      </svg>
+      <div className="ring-center">
+        <span className="ring-pct">{pct}%</span>
+      </div>
+    </div>
+  );
 }
 
 export default function App() {
@@ -33,7 +115,6 @@ export default function App() {
   const [editPriority, setEditPriority] = useState("media");
 
   const loadTodos = useCallback(async () => {
-    setLoading(true);
     setError("");
     try {
       const params = {};
@@ -129,120 +210,156 @@ export default function App() {
 
   return (
     <div className="app">
+      <div className="bg-blob blob-a" aria-hidden="true" />
+      <div className="bg-blob blob-b" aria-hidden="true" />
+
       <header className="masthead">
-        <h1 className="masthead-title">
-          Il <span className="mark">Docket</span>
-        </h1>
-        <span className="masthead-sub">Registro delle pratiche aperte</span>
+        <div>
+          <p className="masthead-date">{todayLabel()}</p>
+          <h1 className="masthead-title">Le mie attività</h1>
+        </div>
       </header>
 
       <div className="board">
-        {/* ---- Colonna laterale: nuova pratica + statistiche ---- */}
+        {/* ---- Colonna laterale ---- */}
         <aside className="side-panel">
-          <div className="panel-card">
-            <span className="panel-label">Apri nuova pratica</span>
+          <section className="panel-card">
+            <h2 className="panel-label">Nuova attività</h2>
             <form className="add-form" onSubmit={handleCreate}>
               <input
                 type="text"
                 placeholder="Cosa devi fare?"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                aria-label="Titolo attività"
               />
               <input
                 type="text"
-                placeholder="Descrizione (opzionale)"
+                placeholder="Aggiungi una nota (opzionale)"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
+                aria-label="Descrizione attività"
               />
-              <select
-                value={priority}
-                onChange={(e) => setPriority(e.target.value)}
+              <div
+                className="priority-segment"
+                role="radiogroup"
+                aria-label="Priorità"
               >
                 {PRIORITIES.map((p) => (
-                  <option key={p.value} value={p.value}>
-                    Priorità: {p.label}
-                  </option>
+                  <button
+                    key={p.value}
+                    type="button"
+                    role="radio"
+                    aria-checked={priority === p.value}
+                    className={`segment-btn prio-${p.value} ${
+                      priority === p.value ? "active" : ""
+                    }`}
+                    onClick={() => setPriority(p.value)}
+                  >
+                    {p.label}
+                  </button>
                 ))}
-              </select>
+              </div>
               <button type="submit" className="btn btn-primary">
-                + Registra pratica
+                <IconPlus />
+                Aggiungi attività
               </button>
             </form>
-          </div>
+          </section>
 
-          <div className="panel-card">
-            <span className="panel-label">Riepilogo</span>
-            <div className="stats-grid">
-              <div className="stat">
-                <span className="stat-num">{activeCount}</span>
-                <span className="stat-label">Da fare</span>
-              </div>
-              <div className="stat">
-                <span className="stat-num">{completedCount}</span>
-                <span className="stat-label">Evase</span>
+          <section className="panel-card progress-card">
+            <h2 className="panel-label">I tuoi progressi</h2>
+            <div className="progress-row">
+              <ProgressRing done={completedCount} total={todos.length} />
+              <div className="stats-col">
+                <div className="stat">
+                  <span className="stat-num">{activeCount}</span>
+                  <span className="stat-label">da fare</span>
+                </div>
+                <div className="stat">
+                  <span className="stat-num">{completedCount}</span>
+                  <span className="stat-label">completate</span>
+                </div>
               </div>
             </div>
             {completedCount > 0 && (
-              <div className="clear-completed-row">
-                <button className="btn-link" onClick={handleClearCompleted}>
-                  Archivia ed elimina le evase
-                </button>
-              </div>
+              <button className="btn-link" onClick={handleClearCompleted}>
+                Elimina le attività completate
+              </button>
             )}
-          </div>
+          </section>
         </aside>
 
-        {/* ---- Colonna principale: il docket ---- */}
-        <main className="docket">
+        {/* ---- Colonna principale ---- */}
+        <main className="task-area">
           <div className="toolbar">
-            <input
-              type="text"
-              placeholder="Cerca nel docket..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="input-search"
-            />
-            <div className="filters">
-              {["tutti", "attivi", "completati"].map((f) => (
+            <div className="search-box">
+              <IconSearch />
+              <input
+                type="text"
+                placeholder="Cerca tra le attività…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                aria-label="Cerca attività"
+              />
+            </div>
+            <div className="filters" role="tablist" aria-label="Filtra attività">
+              {[
+                ["tutti", "Tutte"],
+                ["attivi", "Da fare"],
+                ["completati", "Completate"],
+              ].map(([f, label]) => (
                 <button
                   key={f}
+                  role="tab"
+                  aria-selected={filter === f}
                   className={`filter-btn ${filter === f ? "active" : ""}`}
                   onClick={() => setFilter(f)}
                 >
-                  {f}
+                  {label}
                 </button>
               ))}
             </div>
           </div>
 
-          {error && <div className="error-banner">Attenzione — {error}</div>}
+          {error && (
+            <div className="error-banner" role="alert">
+              Qualcosa è andato storto: {error}
+            </div>
+          )}
 
           <div className="todo-list">
-            {loading && (
-              <p className="empty-state">
-                Consultazione del registro in corso...
-              </p>
-            )}
+            {loading && <p className="empty-state">Caricamento in corso…</p>}
+
             {!loading && todos.length === 0 && (
-              <p className="empty-state">
-                Il docket è vuoto. Registra la prima pratica.
-              </p>
+              <div className="empty-state">
+                <div className="empty-emoji" aria-hidden="true">
+                  ✨
+                </div>
+                <p className="empty-title">
+                  {search || filter !== "tutti"
+                    ? "Nessuna attività trovata"
+                    : "Tutto libero!"}
+                </p>
+                <p className="empty-sub">
+                  {search || filter !== "tutti"
+                    ? "Prova a cambiare la ricerca o il filtro."
+                    : "Aggiungi la tua prima attività per iniziare."}
+                </p>
+              </div>
             )}
 
             {!loading &&
-              todos.map((todo) => {
-                const meta = priorityMeta(todo.priority);
+              todos.map((todo, i) => {
                 const isEditing = editingId === todo.id;
-
                 return (
-                  <div
+                  <article
                     key={todo.id}
-                    className={`todo-card ${todo.completed ? "completed" : ""}`}
+                    className={`todo-card prio-border-${todo.priority || "media"} ${
+                      todo.completed ? "completed" : ""
+                    }`}
+                    style={{ "--i": i }}
                   >
-                    {todo.completed && (
-                      <span className="stamp-evaso">EVASO</span>
-                    )}
-
                     {isEditing ? (
                       <div className="edit-mode">
                         <input
@@ -250,97 +367,113 @@ export default function App() {
                           value={editTitle}
                           onChange={(e) => setEditTitle(e.target.value)}
                           autoFocus
+                          aria-label="Modifica titolo"
                         />
                         <input
                           type="text"
                           value={editDescription}
                           onChange={(e) => setEditDescription(e.target.value)}
-                          placeholder="Descrizione"
+                          placeholder="Nota"
+                          aria-label="Modifica descrizione"
                         />
-                        <div className="form-row">
-                          <select
-                            value={editPriority}
-                            onChange={(e) => setEditPriority(e.target.value)}
+                        <div className="edit-footer">
+                          <div
+                            className="priority-segment small"
+                            role="radiogroup"
+                            aria-label="Priorità"
                           >
                             {PRIORITIES.map((p) => (
-                              <option key={p.value} value={p.value}>
+                              <button
+                                key={p.value}
+                                type="button"
+                                role="radio"
+                                aria-checked={editPriority === p.value}
+                                className={`segment-btn prio-${p.value} ${
+                                  editPriority === p.value ? "active" : ""
+                                }`}
+                                onClick={() => setEditPriority(p.value)}
+                              >
                                 {p.label}
-                              </option>
+                              </button>
                             ))}
-                          </select>
-                          <button
-                            className="btn btn-primary"
-                            onClick={() => saveEdit(todo.id)}
-                          >
-                            Salva
-                          </button>
-                          <button
-                            className="btn btn-ghost"
-                            onClick={cancelEdit}
-                          >
-                            Annulla
-                          </button>
+                          </div>
+                          <div className="edit-actions">
+                            <button
+                              className="btn btn-primary"
+                              onClick={() => saveEdit(todo.id)}
+                            >
+                              Salva
+                            </button>
+                            <button className="btn btn-ghost" onClick={cancelEdit}>
+                              Annulla
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ) : (
                       <>
-                        <div className="todo-main">
-                          <div className="checkbox-wrap">
-                            <input
-                              type="checkbox"
-                              checked={!!todo.completed}
-                              onChange={() => handleToggle(todo.id)}
-                              className="checkbox"
-                              aria-label="Segna come evasa"
-                            />
-                          </div>
-                          <div className="todo-text">
-                            <span className="case-number">
-                              {caseNumber(todo.id)}
+                        <button
+                          className="check"
+                          role="checkbox"
+                          aria-checked={!!todo.completed}
+                          aria-label={
+                            todo.completed
+                              ? `Riapri "${todo.title}"`
+                              : `Completa "${todo.title}"`
+                          }
+                          onClick={() => handleToggle(todo.id)}
+                        >
+                          <IconCheck />
+                        </button>
+
+                        <div className="todo-text">
+                          <div className="todo-title-row">
+                            <span className="todo-title">{todo.title}</span>
+                            <span
+                              className={`priority-chip chip-${
+                                todo.priority || "media"
+                              }`}
+                            >
+                              {todo.priority || "media"}
                             </span>
-                            <div className="todo-title-row">
-                              <span className="todo-title">{todo.title}</span>
-                              <span
-                                className="priority-seal"
-                                style={{ backgroundColor: meta.color }}
-                              >
-                                {meta.label}
-                              </span>
-                            </div>
-                            {todo.description && (
-                              <p className="todo-description">
-                                {todo.description}
-                              </p>
+                          </div>
+                          {todo.description && (
+                            <p className="todo-description">{todo.description}</p>
+                          )}
+                          <span className="todo-date">
+                            {new Date(todo.created_at).toLocaleDateString(
+                              "it-IT",
+                              { day: "numeric", month: "short" },
                             )}
-                            <span className="todo-date">
-                              Aperta il{" "}
-                              {new Date(todo.created_at).toLocaleString(
-                                "it-IT",
-                              )}
-                            </span>
-                          </div>
+                            {" · "}
+                            {new Date(todo.created_at).toLocaleTimeString(
+                              "it-IT",
+                              { hour: "2-digit", minute: "2-digit" },
+                            )}
+                          </span>
                         </div>
+
                         <div className="todo-actions">
                           <button
                             className="icon-btn"
                             onClick={() => startEdit(todo)}
-                            title="Modifica pratica"
-                            aria-label="Modifica"
+                            title="Modifica"
+                            aria-label={`Modifica "${todo.title}"`}
                           >
-                            ✎
+                            <IconEdit />
                           </button>
                           <button
-                            className="icon-btn"
+                            className="icon-btn danger"
                             onClick={() => handleDelete(todo.id)}
-                            title="Elimina pratica"
-                            aria-label="Elimina"
+                            title="Elimina"
+                            aria-label={`Elimina "${todo.title}"`}
                           >
-                            ✕
+                            <IconTrash />
                           </button>
                         </div>
                       </>
                     )}
-                  </div>
+                  </article>
                 );
               })}
           </div>
