@@ -2,21 +2,6 @@
 
 App full-stack completa per gestire una lista di attività, con tutte le operazioni CRUD (crea, leggi, modifica, elimina) e frontend moderno.
 
-## Struttura del progetto
-
-```
-todo-app/
-├── backend/          # API Express + SQLite3
-│   ├── server.js      # Rotte CRUD
-│   ├── database.js    # Connessione e schema SQLite
-│   └── package.json
-└── frontend/          # React (Vite)
-    ├── src/
-    │   ├── App.jsx     # Interfaccia completa
-    │   ├── App.css     # Stile moderno
-    │   └── api.js       # Client per le chiamate al backend
-    └── package.json
-```
 
 ## Come avviare il backend
 
