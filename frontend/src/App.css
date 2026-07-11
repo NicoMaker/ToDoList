@@ -31,7 +31,8 @@
 
   --radius: 16px;
   --radius-lg: 22px;
-  --shadow-card: 0 1px 2px rgba(14, 18, 32, 0.05), 0 8px 24px rgba(14, 18, 32, 0.06);
+  --shadow-card:
+    0 1px 2px rgba(14, 18, 32, 0.05), 0 8px 24px rgba(14, 18, 32, 0.06);
   --shadow-pop: 0 12px 32px rgba(14, 18, 32, 0.12);
   --ease-spring: cubic-bezier(0.34, 1.45, 0.44, 1);
 }
@@ -41,7 +42,11 @@ html {
 }
 
 body {
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
   background: var(--bg);
   min-height: 100vh;
   color: var(--ink);
@@ -91,7 +96,11 @@ button {
   height: 420px;
   bottom: -160px;
   left: -140px;
-  background: radial-gradient(circle, rgba(255, 122, 89, 0.16), transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 122, 89, 0.16),
+    transparent 70%
+  );
 }
 
 /* ---------- Layout ---------- */
@@ -172,7 +181,10 @@ button {
   border-radius: 12px;
   color: var(--ink);
   font-size: 0.95rem;
-  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    background 0.2s;
 }
 .add-form input::placeholder,
 .edit-mode input::placeholder,
@@ -206,7 +218,10 @@ button {
   font-size: 0.84rem;
   font-weight: 600;
   color: var(--muted);
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s,
+  transition:
+    background 0.2s,
+    color 0.2s,
+    box-shadow 0.2s,
     transform 0.25s var(--ease-spring);
 }
 .segment-btn:hover {
@@ -242,7 +257,10 @@ button {
   border-radius: 12px;
   font-size: 0.95rem;
   font-weight: 600;
-  transition: transform 0.25s var(--ease-spring), box-shadow 0.25s, background 0.2s;
+  transition:
+    transform 0.25s var(--ease-spring),
+    box-shadow 0.25s,
+    background 0.2s;
 }
 .btn-primary {
   background: linear-gradient(180deg, var(--accent), var(--accent-deep));
@@ -398,7 +416,9 @@ button {
   font-size: 0.88rem;
   font-weight: 600;
   color: var(--muted);
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 .filter-btn:hover {
   color: var(--ink);
@@ -450,7 +470,9 @@ button {
   box-shadow: var(--shadow-card);
   animation: card-in 0.4s var(--ease-spring) both;
   animation-delay: calc(var(--i, 0) * 40ms);
-  transition: transform 0.25s var(--ease-spring), box-shadow 0.25s,
+  transition:
+    transform 0.25s var(--ease-spring),
+    box-shadow 0.25s,
     opacity 0.25s;
 }
 .todo-card:hover {
@@ -485,7 +507,9 @@ button {
   display: grid;
   place-items: center;
   color: #fff;
-  transition: background 0.25s, border-color 0.25s,
+  transition:
+    background 0.25s,
+    border-color 0.25s,
     transform 0.3s var(--ease-spring);
   padding: 0;
 }
@@ -494,7 +518,9 @@ button {
   height: 14px;
   opacity: 0;
   transform: scale(0.4);
-  transition: opacity 0.2s, transform 0.3s var(--ease-spring);
+  transition:
+    opacity 0.2s,
+    transform 0.3s var(--ease-spring);
 }
 .check:hover {
   border-color: var(--accent);
@@ -571,7 +597,9 @@ button {
   gap: 6px;
   opacity: 0;
   transform: translateX(4px);
-  transition: opacity 0.2s, transform 0.25s var(--ease-spring);
+  transition:
+    opacity 0.2s,
+    transform 0.25s var(--ease-spring);
 }
 .todo-card:hover .todo-actions,
 .todo-card:focus-within .todo-actions {
@@ -587,7 +615,10 @@ button {
   background: var(--surface-2);
   border-radius: 10px;
   color: var(--muted);
-  transition: background 0.2s, color 0.2s, border-color 0.2s,
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s,
     transform 0.25s var(--ease-spring);
 }
 .icon-btn:hover {

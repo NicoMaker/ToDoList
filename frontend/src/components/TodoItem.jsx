@@ -12,7 +12,13 @@ import { IconCheck, IconEdit, IconTrash } from "./Icons";
  * - index: posizione nella lista (per l'animazione a cascata)
  * - onToggle(id), onDelete(todo), onUpdate(id, campi)
  */
-export default function TodoItem({ todo, index, onToggle, onDelete, onUpdate }) {
+export default function TodoItem({
+  todo,
+  index,
+  onToggle,
+  onDelete,
+  onUpdate,
+}) {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
@@ -68,7 +74,10 @@ export default function TodoItem({ todo, index, onToggle, onDelete, onUpdate }) 
               <button className="btn btn-primary" onClick={saveEdit}>
                 Salva
               </button>
-              <button className="btn btn-ghost" onClick={() => setIsEditing(false)}>
+              <button
+                className="btn btn-ghost"
+                onClick={() => setIsEditing(false)}
+              >
                 Annulla
               </button>
             </div>
@@ -93,7 +102,9 @@ export default function TodoItem({ todo, index, onToggle, onDelete, onUpdate }) 
           <div className="todo-text">
             <div className="todo-title-row">
               <span className="todo-title">{todo.title}</span>
-              <span className={`priority-chip chip-${todo.priority || "media"}`}>
+              <span
+                className={`priority-chip chip-${todo.priority || "media"}`}
+              >
                 {todo.priority || "media"}
               </span>
             </div>
