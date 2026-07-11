@@ -10,7 +10,7 @@ import { IconCheck, IconEdit, IconTrash } from "./Icons";
  * Props:
  * - todo: l'attività da mostrare
  * - index: posizione nella lista (per l'animazione a cascata)
- * - onToggle(id), onDelete(id), onUpdate(id, campi)
+ * - onToggle(id), onDelete(todo), onUpdate(id, campi)
  */
 export default function TodoItem({ todo, index, onToggle, onDelete, onUpdate }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -124,7 +124,7 @@ export default function TodoItem({ todo, index, onToggle, onDelete, onUpdate }) 
             </button>
             <button
               className="icon-btn danger"
-              onClick={() => onDelete(todo.id)}
+              onClick={() => onDelete(todo)}
               title="Elimina"
               aria-label={`Elimina "${todo.title}"`}
             >

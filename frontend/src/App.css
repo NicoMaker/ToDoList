@@ -696,3 +696,95 @@ button {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---------- Finestra di conferma ---------- */
+
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(14, 18, 32, 0.4);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: overlay-in 0.2s ease both;
+}
+
+.dialog {
+  width: 100%;
+  max-width: 400px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 26px 24px 22px;
+  text-align: center;
+  box-shadow: 0 24px 64px rgba(14, 18, 32, 0.28);
+  animation: dialog-in 0.3s var(--ease-spring) both;
+}
+
+.dialog-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 14px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--alta-soft);
+  color: var(--alta);
+}
+
+.dialog-title {
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+}
+
+.dialog-message {
+  color: var(--muted);
+  font-size: 0.93rem;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  overflow-wrap: break-word;
+}
+
+.dialog-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.btn-danger {
+  background: linear-gradient(180deg, #ef5359, var(--alta));
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(229, 72, 77, 0.3);
+}
+.btn-danger:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(229, 72, 77, 0.35);
+}
+.btn-danger:active {
+  transform: translateY(0) scale(0.98);
+}
