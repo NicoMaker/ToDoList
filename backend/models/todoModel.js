@@ -28,9 +28,21 @@ function run(sql, params = []) {
   });
 }
 
+/** "5" -> "05" (per confrontare il mese con strftime, che è sempre a 2 cifre) */
+function pad2(n) {
+  return String(n).padStart(2, "0");
+}
+
 const TodoModel = {
-  /** Lista con filtri opzionali: completed, priority, search */
-  findAll({ completed, priority, search } = {}) {
+  /**
+   * Lista con filtri opzionali:
+   * - completed, priority, search (esistenti)
+   * - location: luogo esatto in cui è stata creata l'attività
+   * - date: giorno esatto di scadenza, formato YYYY-MM-DD
+   * - year, month: filtra per mese/anno di scadenza (month 1-12), usati
+   *   dalla vista calendario quando non è selezionato un giorno preciso
+   */
+  findAll({ completed, priority, search, location, date, year, month } = {}) {
     let sql = "SELECT * FROM todos WHERE 1=1";
     const params = [];
 
@@ -46,8 +58,25 @@ const TodoModel = {
       sql += " AND (title LIKE ? OR description LIKE ?)";
       params.push(`%${search}%`, `%${search}%`);
     }
+    if (location) {
+      sql += " AND location = ?";
+      params.push(location);
+    }
+    if (date) {
+      sql += " AND due_date = ?";
+      params.push(date);
+    } else {
+      if (year) {
+        sql += " AND strftime('%Y', due_date) = ?";
+        params.push(String(year));
+      }
+      if (month) {
+        sql += " AND strftime('%m', due_date) = ?";
+        params.push(pad2(month));
+      }
+    }
 
-    sql += " ORDER BY created_at DESC";
+    sql += " ORDER BY (due_date IS NULL), due_date ASC, created_at DESC";
     return all(sql, params);
   },
 
@@ -57,10 +86,16 @@ const TodoModel = {
   },
 
   /** Crea un todo e ritorna la riga appena inserita */
-  async create({ title, description = "", priority = "media" }) {
+  async create({
+    title,
+    description = "",
+    priority = "media",
+    due_date = null,
+    location = "",
+  }) {
     const { lastID } = await run(
-      "INSERT INTO todos (title, description, priority) VALUES (?, ?, ?)",
-      [title, description, priority],
+      "INSERT INTO todos (title, description, priority, due_date, location) VALUES (?, ?, ?, ?, ?)",
+      [title, description, priority, due_date || null, location || ""],
     );
     return TodoModel.findById(lastID);
   },
@@ -69,7 +104,10 @@ const TodoModel = {
    * Aggiorna un todo esistente (i campi non passati restano invariati).
    * Ritorna la riga aggiornata, o null se l'id non esiste.
    */
-  async update(id, { title, description, completed, priority }) {
+  async update(
+    id,
+    { title, description, completed, priority, due_date, location },
+  ) {
     const existing = await TodoModel.findById(id);
     if (!existing) return null;
 
@@ -79,12 +117,23 @@ const TodoModel = {
     const newCompleted =
       completed !== undefined ? (completed ? 1 : 0) : existing.completed;
     const newPriority = priority !== undefined ? priority : existing.priority;
+    const newDueDate = due_date !== undefined ? due_date : existing.due_date;
+    const newLocation = location !== undefined ? location : existing.location;
 
     await run(
       `UPDATE todos
-       SET title = ?, description = ?, completed = ?, priority = ?, updated_at = CURRENT_TIMESTAMP
+       SET title = ?, description = ?, completed = ?, priority = ?,
+           due_date = ?, location = ?, updated_at = CURRENT_TIMESTAMP
        WHERE id = ?`,
-      [newTitle, newDescription, newCompleted, newPriority, id],
+      [
+        newTitle,
+        newDescription,
+        newCompleted,
+        newPriority,
+        newDueDate || null,
+        newLocation || "",
+        id,
+      ],
     );
     return TodoModel.findById(id);
   },
@@ -111,6 +160,37 @@ const TodoModel = {
   async clearCompleted() {
     const { changes } = await run("DELETE FROM todos WHERE completed = 1");
     return changes;
+  },
+
+  /**
+   * Conteggio attività per giorno in un dato mese, per popolare i puntini
+   * nel calendario. Ritorna un oggetto { "YYYY-MM-DD": numero }.
+   */
+  async countByMonth(year, month) {
+    const rows = await all(
+      `SELECT due_date, COUNT(*) AS count
+       FROM todos
+       WHERE due_date IS NOT NULL
+         AND strftime('%Y', due_date) = ?
+         AND strftime('%m', due_date) = ?
+       GROUP BY due_date`,
+      [String(year), pad2(month)],
+    );
+    const map = {};
+    rows.forEach((r) => {
+      map[r.due_date] = r.count;
+    });
+    return map;
+  },
+
+  /** Elenco dei luoghi distinti già usati, per il filtro a tendina. */
+  async listLocations() {
+    const rows = await all(
+      `SELECT DISTINCT location FROM todos
+       WHERE location IS NOT NULL AND location != ''
+       ORDER BY location COLLATE NOCASE`,
+    );
+    return rows.map((r) => r.location);
   },
 };
 

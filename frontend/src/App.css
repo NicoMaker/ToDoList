@@ -819,3 +819,212 @@ button {
 .btn-danger:active {
   transform: translateY(0) scale(0.98);
 }
+
+/* ---------- Campi con icona (data / luogo) nel form e in modifica ---------- */
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.field-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--muted);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    background 0.2s;
+}
+.field-with-icon:focus-within {
+  border-color: var(--accent);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(67, 83, 255, 0.12);
+}
+.field-with-icon input {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 12px 0 !important;
+  flex: 1;
+  min-width: 0;
+}
+.field-with-icon input:focus {
+  box-shadow: none !important;
+}
+
+/* ---------- Meta chip (scadenza, luogo) sulla card attività ---------- */
+
+.todo-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+.meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--muted);
+  border: 1px solid var(--line);
+}
+.meta-date {
+  color: var(--accent-deep);
+  background: var(--accent-soft);
+  border-color: rgba(67, 83, 255, 0.18);
+}
+.meta-location {
+  color: #7a5300;
+  background: var(--media-soft);
+  border-color: rgba(224, 140, 0, 0.18);
+}
+.todo-meta-row .todo-date {
+  display: inline;
+  margin: 0;
+  font-size: 0.78rem;
+}
+
+/* ---------- Filtro per luogo nella toolbar ---------- */
+
+.location-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0 12px;
+  color: var(--muted);
+  box-shadow: var(--shadow-card);
+}
+.location-filter select {
+  border: none;
+  background: transparent;
+  padding: 10px 0;
+  color: var(--ink);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+.location-filter select:focus {
+  outline: none;
+}
+
+/* ---------- Calendario ---------- */
+
+.calendar-panel {
+  padding: 20px 22px 22px;
+}
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.calendar-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0;
+}
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.calendar-nav .icon-btn {
+  width: 28px;
+  height: 28px;
+}
+.calendar-month-label {
+  border: none;
+  background: transparent;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink);
+  padding: 5px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.calendar-month-label:hover {
+  background: var(--accent-soft);
+}
+.calendar-month-label.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 6px;
+}
+.calendar-weekdays span {
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #9aa0b0;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.calendar-day {
+  position: relative;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  color: var(--ink);
+  transition:
+    background 0.2s,
+    color 0.2s,
+    transform 0.2s var(--ease-spring);
+}
+.calendar-day:hover {
+  background: var(--surface-2);
+}
+.calendar-day.today {
+  font-weight: 700;
+  color: var(--accent);
+}
+.calendar-day.active {
+  background: var(--accent);
+  color: #fff;
+  transform: scale(1.06);
+}
+.calendar-dot {
+  position: absolute;
+  bottom: 4px;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--media);
+}
+.calendar-day.active .calendar-dot {
+  background: #fff;
+}
+
+@media (max-width: 640px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}

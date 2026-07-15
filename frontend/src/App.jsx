@@ -3,6 +3,7 @@ import { api } from "./api";
 import Header from "./components/Header";
 import AddTodoForm from "./components/AddTodoForm";
 import ProgressCard from "./components/ProgressCard";
+import CalendarPanel from "./components/CalendarPanel";
 import Toolbar from "./components/Toolbar";
 import TodoList from "./components/TodoList";
 import ConfirmDialog from "./components/ConfirmDialog";
@@ -20,6 +21,22 @@ export default function App() {
   const [filter, setFilter] = useState("tutti"); // tutti | attivi | completati
   const [search, setSearch] = useState("");
 
+  // Filtro luogo (dove è stata creata l'attività) + elenco per la tendina
+  const [locationFilter, setLocationFilter] = useState("");
+  const [locations, setLocations] = useState([]);
+
+  // Filtro data dal calendario: { year, month, day|null, iso? } oppure null
+  const [dateFilter, setDateFilter] = useState(null);
+
+  const loadLocations = useCallback(async () => {
+    try {
+      const data = await api.getLocations();
+      setLocations(data);
+    } catch {
+      // Non blocchiamo l'app se il filtro luoghi non si carica
+    }
+  }, []);
+
   const loadTodos = useCallback(async () => {
     setError("");
     try {
@@ -27,6 +44,17 @@ export default function App() {
       if (filter === "attivi") params.completed = "false";
       if (filter === "completati") params.completed = "true";
       if (search.trim()) params.search = search.trim();
+      if (locationFilter) params.location = locationFilter;
+
+      if (dateFilter) {
+        if (dateFilter.day) {
+          params.date = dateFilter.iso;
+        } else {
+          params.year = dateFilter.year;
+          params.month = dateFilter.month;
+        }
+      }
+
       const data = await api.getAll(params);
       setTodos(data);
     } catch (e) {
@@ -34,18 +62,22 @@ export default function App() {
     } finally {
       setLoading(false);
     }
-  }, [filter, search]);
+  }, [filter, search, locationFilter, dateFilter]);
 
   useEffect(() => {
     const t = setTimeout(loadTodos, 250); // debounce ricerca
     return () => clearTimeout(t);
   }, [loadTodos]);
 
+  useEffect(() => {
+    loadLocations();
+  }, [loadLocations]);
+
   /** Esegue un'azione API, ricarica la lista e ritorna true se ok. */
   const run = async (action) => {
     try {
       await action();
-      await loadTodos();
+      await Promise.all([loadTodos(), loadLocations()]);
       return true;
     } catch (e) {
       setError(e.message);
@@ -85,7 +117,11 @@ export default function App() {
 
   const activeCount = todos.filter((t) => !t.completed).length;
   const completedCount = todos.filter((t) => t.completed).length;
-  const isFiltered = filter !== "tutti" || search.trim() !== "";
+  const isFiltered =
+    filter !== "tutti" ||
+    search.trim() !== "" ||
+    locationFilter !== "" ||
+    dateFilter !== null;
 
   return (
     <div className="app">
@@ -96,7 +132,8 @@ export default function App() {
 
       <div className="board">
         <aside className="side-panel">
-          <AddTodoForm onCreate={handleCreate} />
+          <AddTodoForm onCreate={handleCreate} defaultDate={dateFilter?.iso} />
+          <CalendarPanel selected={dateFilter} onSelect={setDateFilter} />
           <ProgressCard
             activeCount={activeCount}
             completedCount={completedCount}
@@ -110,6 +147,9 @@ export default function App() {
             onSearchChange={setSearch}
             filter={filter}
             onFilterChange={setFilter}
+            locations={locations}
+            locationFilter={locationFilter}
+            onLocationFilterChange={setLocationFilter}
           />
 
           {error && (

@@ -1,9 +1,16 @@
 import { useState } from "react";
 import PrioritySegment from "./PrioritySegment";
-import { IconCheck, IconEdit, IconTrash } from "./Icons";
+import { IconCheck, IconEdit, IconTrash, IconPin, IconCalendar } from "./Icons";
+
+/** Formatta una data YYYY-MM-DD in "gg mese" leggibile, in italiano */
+function formatDueDate(dueDate) {
+  if (!dueDate) return null;
+  const d = new Date(`${dueDate}T00:00:00`);
+  return d.toLocaleDateString("it-IT", { day: "numeric", month: "short" });
+}
 
 /**
- * Singola attività: checkbox, testo, chip priorità e azioni.
+ * Singola attività: checkbox, testo, chip priorità, luogo/scadenza e azioni.
  * La modalità modifica è gestita internamente: al salvataggio
  * chiama onUpdate(id, campi).
  *
@@ -23,11 +30,15 @@ export default function TodoItem({
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editPriority, setEditPriority] = useState("media");
+  const [editDueDate, setEditDueDate] = useState("");
+  const [editLocation, setEditLocation] = useState("");
 
   const startEdit = () => {
     setEditTitle(todo.title);
     setEditDescription(todo.description || "");
     setEditPriority(todo.priority || "media");
+    setEditDueDate(todo.due_date || "");
+    setEditLocation(todo.location || "");
     setIsEditing(true);
   };
 
@@ -37,9 +48,13 @@ export default function TodoItem({
       title: editTitle,
       description: editDescription,
       priority: editPriority,
+      due_date: editDueDate || null,
+      location: editLocation,
     });
     if (ok) setIsEditing(false);
   };
+
+  const dueLabel = formatDueDate(todo.due_date);
 
   return (
     <article
@@ -64,6 +79,27 @@ export default function TodoItem({
             placeholder="Nota"
             aria-label="Modifica descrizione"
           />
+          <div className="form-row">
+            <label className="field-with-icon">
+              <IconCalendar />
+              <input
+                type="date"
+                value={editDueDate}
+                onChange={(e) => setEditDueDate(e.target.value)}
+                aria-label="Modifica data di scadenza"
+              />
+            </label>
+            <label className="field-with-icon">
+              <IconPin />
+              <input
+                type="text"
+                value={editLocation}
+                onChange={(e) => setEditLocation(e.target.value)}
+                placeholder="Luogo"
+                aria-label="Modifica luogo"
+              />
+            </label>
+          </div>
           <div className="edit-footer">
             <PrioritySegment
               value={editPriority}
@@ -111,17 +147,28 @@ export default function TodoItem({
             {todo.description && (
               <p className="todo-description">{todo.description}</p>
             )}
-            <span className="todo-date">
-              {new Date(todo.created_at).toLocaleDateString("it-IT", {
-                day: "numeric",
-                month: "short",
-              })}
-              {" · "}
-              {new Date(todo.created_at).toLocaleTimeString("it-IT", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </span>
+
+            <div className="todo-meta-row">
+              {dueLabel && (
+                <span className="meta-chip meta-date">
+                  <IconCalendar width={12} height={12} />
+                  {dueLabel}
+                </span>
+              )}
+              {todo.location && (
+                <span className="meta-chip meta-location">
+                  <IconPin width={12} height={12} />
+                  {todo.location}
+                </span>
+              )}
+              <span className="todo-date">
+                Creato il{" "}
+                {new Date(todo.created_at).toLocaleDateString("it-IT", {
+                  day: "numeric",
+                  month: "short",
+                })}
+              </span>
+            </div>
           </div>
 
           <div className="todo-actions">

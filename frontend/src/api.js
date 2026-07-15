@@ -38,4 +38,14 @@ export const api = {
     fetch(`${BASE_URL}/clear/completed`, { method: "DELETE" }).then(
       handleResponse,
     ),
+
+  /** Luoghi distinti già usati nelle attività, per il filtro a tendina. */
+  getLocations: () =>
+    fetch(`${BASE_URL}/meta/locations`).then(handleResponse),
+
+  /** Conteggio attività per giorno in un mese: { "YYYY-MM-DD": numero } */
+  getCalendarCounts: (year, month) =>
+    fetch(`${BASE_URL}/meta/calendar?year=${year}&month=${month}`).then(
+      handleResponse,
+    ),
 };
