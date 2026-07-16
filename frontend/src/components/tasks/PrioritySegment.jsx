@@ -1,4 +1,4 @@
-import { PRIORITIES } from "../constants";
+import { PRIORITIES } from "../../constants";
 
 /**
  * Selettore di priorità a segmenti (Alta / Media / Bassa).

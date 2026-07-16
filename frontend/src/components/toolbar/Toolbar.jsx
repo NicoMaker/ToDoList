@@ -1,4 +1,4 @@
-import { IconSearch, IconPin } from "./Icons";
+import { IconSearch, IconPin } from "../icons/Icons";
 
 const FILTERS = [
   ["tutti", "Tutte"],

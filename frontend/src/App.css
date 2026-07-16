@@ -5,36 +5,40 @@
 }
 
 :root {
-  /* Superfici */
-  --bg: #f3f4fb;
-  --surface: #ffffff;
-  --surface-2: #f7f8fd;
-  --line: #e6e8f2;
+  /* Superfici — carta da scrivania */
+  --paper: #ede7d8;
+  --card: #fbf8f1;
+  --card-2: #f3eee0;
+  --line: #ddd2b8;
 
-  /* Testo */
-  --ink: #0e1220;
-  --muted: #666d80;
+  /* Inchiostro */
+  --ink: #2a2521;
+  --muted: #7d7566;
 
-  /* Accento ultramarine */
-  --accent: #4353ff;
-  --accent-deep: #2e3bd9;
-  --accent-soft: #edefff;
-  --accent-glow: rgba(67, 83, 255, 0.28);
+  /* Accento principale — inchiostro verde pino */
+  --accent: #2f5d50;
+  --accent-deep: #1e3f37;
+  --accent-soft: #dfece6;
+  --accent-glow: rgba(47, 93, 80, 0.24);
 
-  /* Priorità */
-  --alta: #e5484d;
-  --alta-soft: #fdecec;
-  --media: #e08c00;
-  --media-soft: #fef3e0;
-  --bassa: #12a150;
-  --bassa-soft: #e7f7ee;
+  /* Priorità — timbri a ceralacca */
+  --alta: #a6432e;
+  --alta-soft: #f4e3dd;
+  --media: #b07a26;
+  --media-soft: #f2e6c9;
+  --bassa: #55763f;
+  --bassa-soft: #e7eedc;
 
-  --radius: 16px;
-  --radius-lg: 22px;
+  --radius: 14px;
+  --radius-lg: 20px;
   --shadow-card:
-    0 1px 2px rgba(14, 18, 32, 0.05), 0 8px 24px rgba(14, 18, 32, 0.06);
-  --shadow-pop: 0 12px 32px rgba(14, 18, 32, 0.12);
+    0 1px 2px rgba(42, 37, 33, 0.06), 0 8px 20px rgba(42, 37, 33, 0.08);
+  --shadow-pop: 0 14px 30px rgba(42, 37, 33, 0.14);
   --ease-spring: cubic-bezier(0.34, 1.45, 0.44, 1);
+
+  --font-display: "Fraunces", "Iowan Old Style", serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 }
 
 html {
@@ -42,12 +46,14 @@ html {
 }
 
 body {
-  font-family:
-    "Inter",
-    system-ui,
-    -apple-system,
-    sans-serif;
-  background: var(--bg);
+  font-family: var(--font-body);
+  background-color: var(--paper);
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(42, 37, 33, 0.05) 1px,
+    transparent 0
+  );
+  background-size: 3px 3px;
   min-height: 100vh;
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
@@ -74,22 +80,26 @@ button {
   border-radius: 6px;
 }
 
-/* ---------- Sfondo ambientale ---------- */
+/* ---------- Luce ambientale ---------- */
 
 .bg-blob {
   position: fixed;
   border-radius: 50%;
-  filter: blur(90px);
+  filter: blur(100px);
   pointer-events: none;
   z-index: 0;
-  opacity: 0.55;
+  opacity: 0.5;
 }
 .blob-a {
   width: 480px;
   height: 480px;
   top: -180px;
   right: -120px;
-  background: radial-gradient(circle, rgba(67, 83, 255, 0.22), transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(176, 122, 38, 0.16),
+    transparent 70%
+  );
 }
 .blob-b {
   width: 420px;
@@ -98,7 +108,7 @@ button {
   left: -140px;
   background: radial-gradient(
     circle,
-    rgba(255, 122, 89, 0.16),
+    rgba(47, 93, 80, 0.14),
     transparent 70%
   );
 }
@@ -115,21 +125,37 @@ button {
 }
 
 .masthead {
-  margin-bottom: clamp(24px, 4vw, 40px);
+  margin-bottom: clamp(28px, 4vw, 44px);
+  padding-bottom: clamp(16px, 2.5vw, 22px);
+  border-bottom: 1px solid var(--line);
+  position: relative;
+}
+.masthead::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 46px;
+  height: 2px;
+  background: var(--accent);
 }
 .masthead-date {
-  font-size: 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
   font-weight: 600;
   color: var(--accent);
-  letter-spacing: 0.01em;
-  margin-bottom: 6px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
 }
 .masthead-title {
-  font-family: "Sora", "Inter", sans-serif;
-  font-size: clamp(1.9rem, 4.5vw, 2.7rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(2rem, 4.8vw, 2.9rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
   line-height: 1.05;
+  color: var(--ink);
 }
 
 .board {
@@ -150,7 +176,7 @@ button {
 }
 
 .panel-card {
-  background: var(--surface);
+  background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   padding: 22px;
@@ -158,12 +184,23 @@ button {
 }
 
 .panel-label {
-  display: block;
-  font-family: "Sora", "Inter", sans-serif;
-  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--font-display);
+  font-size: 1.08rem;
   font-weight: 600;
   letter-spacing: -0.01em;
+  color: var(--ink);
   margin-bottom: 16px;
+}
+.panel-label::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
 }
 
 .add-form {
@@ -176,9 +213,9 @@ button {
 .edit-mode input {
   width: 100%;
   padding: 12px 14px;
-  background: var(--surface-2);
+  background: var(--card-2);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 11px;
   color: var(--ink);
   font-size: 0.95rem;
   transition:
@@ -189,7 +226,7 @@ button {
 .add-form input::placeholder,
 .edit-mode input::placeholder,
 .search-box input::placeholder {
-  color: #9aa0b0;
+  color: #a89c85;
 }
 .add-form input:focus,
 .edit-mode input:focus,
@@ -197,20 +234,24 @@ button {
   outline: none;
   border-color: var(--accent);
   background: #fff;
-  box-shadow: 0 0 0 4px rgba(67, 83, 255, 0.12);
+  box-shadow: 0 0 0 4px var(--accent-soft);
 }
 
-/* Selettore priorità a segmenti */
+/* Selettore priorità a segmenti — puntini a ceralacca */
 .priority-segment {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 6px;
-  background: var(--surface-2);
+  background: var(--card-2);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 11px;
   padding: 5px;
 }
 .segment-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   padding: 9px 4px;
   border: none;
   background: transparent;
@@ -224,13 +265,25 @@ button {
     box-shadow 0.2s,
     transform 0.25s var(--ease-spring);
 }
+.segment-btn::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.35;
+  flex-shrink: 0;
+}
 .segment-btn:hover {
   color: var(--ink);
 }
 .segment-btn.active {
   background: #fff;
-  box-shadow: 0 1px 4px rgba(14, 18, 32, 0.12);
+  box-shadow: 0 1px 4px rgba(42, 37, 33, 0.12);
   transform: scale(1.02);
+}
+.segment-btn.active::before {
+  opacity: 1;
 }
 .segment-btn.prio-alta.active {
   color: var(--alta);
@@ -254,7 +307,7 @@ button {
   gap: 8px;
   padding: 12px 18px;
   border: none;
-  border-radius: 12px;
+  border-radius: 11px;
   font-size: 0.95rem;
   font-weight: 600;
   transition:
@@ -275,12 +328,12 @@ button {
   transform: translateY(0) scale(0.98);
 }
 .btn-ghost {
-  background: var(--surface-2);
+  background: var(--card-2);
   color: var(--ink);
   border: 1px solid var(--line);
 }
 .btn-ghost:hover {
-  background: #eef0f8;
+  background: #eae2cc;
 }
 
 .btn-link {
@@ -298,7 +351,7 @@ button {
   text-decoration: underline;
 }
 
-/* Progressi */
+/* Progressi — timbro ad anello */
 .progress-row {
   display: flex;
   align-items: center;
@@ -335,9 +388,9 @@ button {
   place-items: center;
 }
 .ring-pct {
-  font-family: "Sora", "Inter", sans-serif;
-  font-size: 1rem;
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 0.98rem;
+  font-weight: 600;
 }
 .stats-col {
   display: flex;
@@ -350,9 +403,9 @@ button {
   gap: 8px;
 }
 .stat-num {
-  font-family: "Sora", "Inter", sans-serif;
-  font-size: 1.35rem;
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 1.3rem;
+  font-weight: 600;
 }
 .stat-label {
   font-size: 0.88rem;
@@ -375,9 +428,9 @@ button {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--surface);
+  background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 11px;
   padding: 0 14px;
   color: var(--muted);
   box-shadow: var(--shadow-card);
@@ -396,15 +449,15 @@ button {
 }
 .search-box:focus-within {
   border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(67, 83, 255, 0.12);
+  box-shadow: 0 0 0 4px var(--accent-soft);
 }
 
 .filters {
   display: flex;
   gap: 4px;
-  background: var(--surface);
+  background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 11px;
   padding: 4px;
   box-shadow: var(--shadow-card);
 }
@@ -412,7 +465,7 @@ button {
   padding: 8px 14px;
   border: none;
   background: transparent;
-  border-radius: 9px;
+  border-radius: 8px;
   font-size: 0.88rem;
   font-weight: 600;
   color: var(--muted);
@@ -432,9 +485,9 @@ button {
 
 .error-banner {
   background: var(--alta-soft);
-  border: 1px solid rgba(229, 72, 77, 0.35);
-  color: #b02a30;
-  border-radius: 12px;
+  border: 1px solid rgba(166, 67, 46, 0.3);
+  color: #7c3222;
+  border-radius: 11px;
   padding: 12px 16px;
   font-size: 0.92rem;
   margin-bottom: 16px;
@@ -443,7 +496,7 @@ button {
 .todo-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 @keyframes card-in {
@@ -457,16 +510,17 @@ button {
   }
 }
 
+/* Schede pinnate a bacheca: leggera rotazione alternata, si raddrizzano
+   e si sollevano al passaggio del mouse per restare leggibili */
 .todo-card {
   position: relative;
   display: flex;
   align-items: flex-start;
   gap: 14px;
-  background: var(--surface);
+  background: var(--card);
   border: 1px solid var(--line);
-  border-left-width: 4px;
   border-radius: var(--radius);
-  padding: 16px 16px 16px 14px;
+  padding: 18px 18px 18px 30px;
   box-shadow: var(--shadow-card);
   animation: card-in 0.4s var(--ease-spring) both;
   animation-delay: calc(var(--i, 0) * 40ms);
@@ -475,21 +529,39 @@ button {
     box-shadow 0.25s,
     opacity 0.25s;
 }
-.todo-card:hover {
-  transform: translateY(-2px);
+.todo-list .todo-card:nth-child(odd) {
+  transform: rotate(-0.5deg);
+}
+.todo-list .todo-card:nth-child(even) {
+  transform: rotate(0.45deg);
+}
+.todo-card:hover,
+.todo-card:focus-within {
+  transform: rotate(0deg) translateY(-3px);
   box-shadow: var(--shadow-pop);
 }
-.prio-border-alta {
-  border-left-color: var(--alta);
+/* Spillo colorato per priorità, nell'angolo in alto a sinistra */
+.todo-card::before {
+  content: "";
+  position: absolute;
+  top: 14px;
+  left: 12px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(42, 37, 33, 0.35);
 }
-.prio-border-media {
-  border-left-color: var(--media);
+.prio-border-alta::before {
+  background: var(--alta);
 }
-.prio-border-bassa {
-  border-left-color: var(--bassa);
+.prio-border-media::before {
+  background: var(--media);
+}
+.prio-border-bassa::before {
+  background: var(--bassa);
 }
 .todo-card.completed {
-  opacity: 0.62;
+  opacity: 0.6;
 }
 .todo-card.completed .todo-title {
   color: var(--muted);
@@ -502,7 +574,7 @@ button {
   height: 26px;
   margin-top: 2px;
   border-radius: 50%;
-  border: 2px solid #c6cad9;
+  border: 2px solid #cbbfa2;
   background: #fff;
   display: grid;
   place-items: center;
@@ -546,7 +618,8 @@ button {
   flex-wrap: wrap;
 }
 .todo-title {
-  font-size: 1.02rem;
+  font-family: var(--font-display);
+  font-size: 1.08rem;
   font-weight: 600;
   letter-spacing: -0.01em;
   position: relative;
@@ -558,13 +631,25 @@ button {
   text-decoration-thickness: 2px;
 }
 
+/* Chip priorità — timbro a ceralacca */
 .priority-chip {
-  font-size: 0.7rem;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 4px 10px;
+  letter-spacing: 0.08em;
+  padding: 4px 10px 4px 8px;
   border-radius: 999px;
+}
+.priority-chip::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
 }
 .chip-alta {
   background: var(--alta-soft);
@@ -589,7 +674,7 @@ button {
   display: block;
   margin-top: 8px;
   font-size: 0.78rem;
-  color: #9aa0b0;
+  color: #a89c85;
 }
 
 .todo-actions {
@@ -612,8 +697,8 @@ button {
   display: grid;
   place-items: center;
   border: 1px solid var(--line);
-  background: var(--surface-2);
-  border-radius: 10px;
+  background: var(--card-2);
+  border-radius: 9px;
   color: var(--muted);
   transition:
     background 0.2s,
@@ -624,13 +709,13 @@ button {
 .icon-btn:hover {
   background: var(--accent-soft);
   color: var(--accent);
-  border-color: rgba(67, 83, 255, 0.35);
+  border-color: rgba(47, 93, 80, 0.35);
   transform: scale(1.06);
 }
 .icon-btn.danger:hover {
   background: var(--alta-soft);
   color: var(--alta);
-  border-color: rgba(229, 72, 77, 0.35);
+  border-color: rgba(166, 67, 46, 0.35);
 }
 
 /* Modalità modifica */
@@ -665,7 +750,7 @@ button {
 .empty-state {
   text-align: center;
   padding: 56px 20px;
-  background: var(--surface);
+  background: var(--card);
   border: 1px dashed var(--line);
   border-radius: var(--radius-lg);
   color: var(--muted);
@@ -675,8 +760,8 @@ button {
   margin-bottom: 10px;
 }
 .empty-title {
-  font-family: "Sora", "Inter", sans-serif;
-  font-size: 1.1rem;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
   font-weight: 600;
   color: var(--ink);
   margin-bottom: 4px;
@@ -702,7 +787,11 @@ button {
 
 @media (max-width: 480px) {
   .todo-card {
-    padding: 14px 12px;
+    padding: 14px 14px 14px 26px;
+  }
+  .todo-list .todo-card:nth-child(odd),
+  .todo-list .todo-card:nth-child(even) {
+    transform: none;
   }
   .toolbar {
     flex-direction: column;
@@ -725,6 +814,10 @@ button {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  .todo-list .todo-card:nth-child(odd),
+  .todo-list .todo-card:nth-child(even) {
+    transform: none;
   }
 }
 
@@ -756,7 +849,7 @@ button {
   display: grid;
   place-items: center;
   padding: 20px;
-  background: rgba(14, 18, 32, 0.4);
+  background: rgba(42, 37, 33, 0.42);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   animation: overlay-in 0.2s ease both;
@@ -765,12 +858,12 @@ button {
 .dialog {
   width: 100%;
   max-width: 400px;
-  background: var(--surface);
+  background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   padding: 26px 24px 22px;
   text-align: center;
-  box-shadow: 0 24px 64px rgba(14, 18, 32, 0.28);
+  box-shadow: 0 24px 64px rgba(42, 37, 33, 0.3);
   animation: dialog-in 0.3s var(--ease-spring) both;
 }
 
@@ -786,9 +879,9 @@ button {
 }
 
 .dialog-title {
-  font-family: "Sora", "Inter", sans-serif;
-  font-size: 1.15rem;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 600;
   letter-spacing: -0.01em;
   margin-bottom: 8px;
 }
@@ -808,13 +901,13 @@ button {
 }
 
 .btn-danger {
-  background: linear-gradient(180deg, #ef5359, var(--alta));
+  background: linear-gradient(180deg, #bf5138, var(--alta));
   color: #fff;
-  box-shadow: 0 6px 16px rgba(229, 72, 77, 0.3);
+  box-shadow: 0 6px 16px rgba(166, 67, 46, 0.32);
 }
 .btn-danger:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 22px rgba(229, 72, 77, 0.35);
+  box-shadow: 0 10px 22px rgba(166, 67, 46, 0.35);
 }
 .btn-danger:active {
   transform: translateY(0) scale(0.98);
@@ -832,9 +925,9 @@ button {
   align-items: center;
   gap: 8px;
   padding: 0 12px;
-  background: var(--surface-2);
+  background: var(--card-2);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 11px;
   color: var(--muted);
   transition:
     border-color 0.2s,
@@ -844,7 +937,7 @@ button {
 .field-with-icon:focus-within {
   border-color: var(--accent);
   background: #fff;
-  box-shadow: 0 0 0 4px rgba(67, 83, 255, 0.12);
+  box-shadow: 0 0 0 4px var(--accent-soft);
 }
 .field-with-icon input {
   border: none !important;
@@ -865,34 +958,38 @@ button {
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 .meta-chip {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 0.76rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
   font-weight: 600;
   padding: 4px 10px;
   border-radius: 999px;
-  background: var(--surface-2);
+  background: var(--card-2);
   color: var(--muted);
   border: 1px solid var(--line);
 }
 .meta-date {
   color: var(--accent-deep);
   background: var(--accent-soft);
-  border-color: rgba(67, 83, 255, 0.18);
+  border-color: rgba(47, 93, 80, 0.2);
 }
+/* Timbro di viaggio per il luogo: bordo tratteggiato, leggera rotazione */
 .meta-location {
-  color: #7a5300;
+  color: #7a5613;
   background: var(--media-soft);
-  border-color: rgba(224, 140, 0, 0.18);
+  border: 1px dashed rgba(176, 122, 38, 0.55);
+  transform: rotate(-1.2deg);
 }
 .todo-meta-row .todo-date {
   display: inline;
   margin: 0;
   font-size: 0.78rem;
+  font-family: var(--font-mono);
 }
 
 /* ---------- Filtro per luogo nella toolbar ---------- */
@@ -901,9 +998,9 @@ button {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--surface);
+  background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 11px;
   padding: 0 12px;
   color: var(--muted);
   box-shadow: var(--shadow-card);
@@ -920,7 +1017,7 @@ button {
   outline: none;
 }
 
-/* ---------- Calendario ---------- */
+/* ---------- Calendario — griglia di timbri postali ---------- */
 
 .calendar-panel {
   padding: 20px 22px 22px;
@@ -932,9 +1029,6 @@ button {
   margin-bottom: 14px;
 }
 .calendar-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   margin-bottom: 0;
 }
 .calendar-nav {
@@ -947,10 +1041,13 @@ button {
   height: 28px;
 }
 .calendar-month-label {
+  font-family: var(--font-mono);
   border: none;
   background: transparent;
-  font-size: 0.82rem;
-  font-weight: 700;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   color: var(--ink);
   padding: 5px 10px;
   border-radius: 8px;
@@ -974,9 +1071,10 @@ button {
 }
 .calendar-weekdays span {
   text-align: center;
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: #9aa0b0;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #a89c85;
 }
 
 .calendar-grid {
@@ -989,27 +1087,35 @@ button {
   aspect-ratio: 1;
   display: grid;
   place-items: center;
-  border: none;
+  border: 1.5px solid transparent;
   background: transparent;
-  border-radius: 10px;
-  font-size: 0.84rem;
+  border-radius: 50%;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
   color: var(--ink);
   transition:
     background 0.2s,
     color 0.2s,
+    border-color 0.2s,
     transform 0.2s var(--ease-spring);
 }
 .calendar-day:hover {
-  background: var(--surface-2);
+  background: var(--card-2);
 }
+/* "Oggi" — anello tratteggiato, come un timbro postale in attesa */
 .calendar-day.today {
-  font-weight: 700;
+  font-weight: 600;
   color: var(--accent);
+  border-color: var(--accent);
+  border-style: dashed;
 }
+/* Giorno selezionato — timbro pieno */
 .calendar-day.active {
   background: var(--accent);
+  border-color: var(--accent);
+  border-style: solid;
   color: #fff;
-  transform: scale(1.06);
+  transform: scale(1.08) rotate(-3deg);
 }
 .calendar-dot {
   position: absolute;
@@ -1021,6 +1127,50 @@ button {
 }
 .calendar-day.active .calendar-dot {
   background: #fff;
+}
+
+.calendar-hint {
+  font-size: 0.74rem;
+  color: var(--muted);
+  margin-top: 12px;
+  line-height: 1.4;
+}
+
+.calendar-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.calendar-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 4px 6px 4px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+  border: 1px solid rgba(47, 93, 80, 0.2);
+}
+.calendar-chip button {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(47, 93, 80, 0.14);
+  color: var(--accent-deep);
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.calendar-chip button:hover {
+  background: var(--accent);
+  color: #fff;
 }
 
 @media (max-width: 640px) {

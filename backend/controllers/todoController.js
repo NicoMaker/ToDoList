@@ -14,7 +14,7 @@ const todoController = {
   /** GET /api/todos — lista con filtri (completed, priority, search, location, date, year, month) */
   async list(req, res, next) {
     try {
-      const { completed, priority, search, location, date, year, month } =
+      const { completed, priority, search, location, date, dates, year, month } =
         req.query;
 
       if (date && !isValidDate(date)) {
@@ -23,12 +23,27 @@ const todoController = {
           .json({ error: "Il parametro date deve avere formato YYYY-MM-DD" });
       }
 
+      let datesArr;
+      if (dates) {
+        datesArr = String(dates)
+          .split(",")
+          .map((d) => d.trim())
+          .filter(Boolean);
+        const invalid = datesArr.find((d) => !isValidDate(d));
+        if (invalid) {
+          return res.status(400).json({
+            error: `Data non valida in "dates": ${invalid} (atteso YYYY-MM-DD)`,
+          });
+        }
+      }
+
       const todos = await TodoModel.findAll({
         completed,
         priority,
         search,
         location,
         date,
+        dates: datesArr,
         year,
         month,
       });

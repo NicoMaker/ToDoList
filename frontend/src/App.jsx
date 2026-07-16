@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { api } from "./api";
-import Header from "./components/Header";
-import AddTodoForm from "./components/AddTodoForm";
-import ProgressCard from "./components/ProgressCard";
-import CalendarPanel from "./components/CalendarPanel";
-import Toolbar from "./components/Toolbar";
-import TodoList from "./components/TodoList";
-import ConfirmDialog from "./components/ConfirmDialog";
+import Header from "./components/layout/Header";
+import AddTodoForm from "./components/tasks/AddTodoForm";
+import ProgressCard from "./components/feedback/ProgressCard";
+import CalendarPanel from "./components/calendar/CalendarPanel";
+import Toolbar from "./components/toolbar/Toolbar";
+import TodoList from "./components/tasks/TodoList";
+import ConfirmDialog from "./components/feedback/ConfirmDialog";
 
 /**
  * App: unica fonte di verità per i dati.
@@ -47,9 +47,9 @@ export default function App() {
       if (locationFilter) params.location = locationFilter;
 
       if (dateFilter) {
-        if (dateFilter.day) {
-          params.date = dateFilter.iso;
-        } else {
+        if (dateFilter.type === "days") {
+          params.dates = dateFilter.dates.join(",");
+        } else if (dateFilter.type === "month") {
           params.year = dateFilter.year;
           params.month = dateFilter.month;
         }
@@ -132,7 +132,14 @@ export default function App() {
 
       <div className="board">
         <aside className="side-panel">
-          <AddTodoForm onCreate={handleCreate} defaultDate={dateFilter?.iso} />
+          <AddTodoForm
+            onCreate={handleCreate}
+            defaultDate={
+              dateFilter?.type === "days" && dateFilter.dates.length === 1
+                ? dateFilter.dates[0]
+                : ""
+            }
+          />
           <CalendarPanel selected={dateFilter} onSelect={setDateFilter} />
           <ProgressCard
             activeCount={activeCount}

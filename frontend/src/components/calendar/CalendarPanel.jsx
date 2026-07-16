@@ -1,6 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
-import { api } from "../api";
-import { IconCalendar, IconChevronLeft, IconChevronRight } from "./Icons";
+import { api } from "../../api";
+import {
+  IconCalendar,
+  IconChevronLeft,
+  IconChevronRight,
+  IconX,
+} from "../icons/Icons";
 
 const MESI = [
   "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
@@ -27,24 +32,27 @@ function firstWeekdayOffset(year, month) {
   return (jsDay + 6) % 7;
 }
 
+/** "2026-07-16" -> "16 lug" */
+function formatChip(iso) {
+  const d = new Date(`${iso}T00:00:00`);
+  return d.toLocaleDateString("it-IT", { day: "numeric", month: "short" });
+}
+
 /**
- * Pannello calendario: naviga tra i mesi, mostra un puntino sui giorni
- * con attività (tramite conteggio dal backend) e permette di selezionare
- * un giorno preciso oppure "tutto il mese" come criterio di filtro.
- * Chiama onSelect({ year, month, day }) — day è null se si vuole l'intero mese.
+ * Pannello calendario: naviga tra i mesi, vedi un puntino sui giorni con
+ * attività e scegli come filtrare la lista:
+ * - clicca uno o più giorni per selezionarli insieme (anche in mesi diversi,
+ *   navigando avanti e indietro) e vedere tutte le attività di quei giorni;
+ * - clicca il nome del mese per filtrare invece l'intero mese.
  *
  * Props:
- * - selected: { year, month, day } | null (null = nessun filtro data attivo)
- * - onSelect(selection): selection è { year, month, day|null } oppure null per rimuovere il filtro
+ * - selected: null | { type: "days", dates: string[] } | { type: "month", year, month }
+ * - onSelect(selection): come sopra, oppure null per rimuovere il filtro
  */
 export default function CalendarPanel({ selected, onSelect }) {
   const today = new Date();
-  const [viewYear, setViewYear] = useState(
-    selected?.year ?? today.getFullYear(),
-  );
-  const [viewMonth, setViewMonth] = useState(
-    selected?.month ?? today.getMonth() + 1,
-  );
+  const [viewYear, setViewYear] = useState(today.getFullYear());
+  const [viewMonth, setViewMonth] = useState(today.getMonth() + 1);
   const [counts, setCounts] = useState({});
 
   const loadCounts = useCallback(async () => {
@@ -74,26 +82,33 @@ export default function CalendarPanel({ selected, onSelect }) {
     setViewYear(y);
   };
 
-  const isSelectedMonth =
-    selected && selected.year === viewYear && selected.month === viewMonth;
-  const selectedDay = isSelectedMonth ? selected.day : null;
+  const isDaysMode = selected?.type === "days";
+  const selectedDates = isDaysMode ? selected.dates : [];
+  const isWholeMonthActive =
+    selected?.type === "month" &&
+    selected.year === viewYear &&
+    selected.month === viewMonth;
 
-  const handleDayClick = (day) => {
+  const toggleDay = (day) => {
     const iso = toISODate(viewYear, viewMonth, day);
-    const alreadySelected = selectedDay === day;
-    if (alreadySelected) {
-      onSelect(null); // ri-clicco lo stesso giorno → tolgo il filtro
+    let next;
+    if (selectedDates.includes(iso)) {
+      next = selectedDates.filter((d) => d !== iso);
     } else {
-      onSelect({ year: viewYear, month: viewMonth, day, iso });
+      next = [...selectedDates, iso].sort();
     }
+    onSelect(next.length > 0 ? { type: "days", dates: next } : null);
+  };
+
+  const removeDate = (iso) => {
+    const next = selectedDates.filter((d) => d !== iso);
+    onSelect(next.length > 0 ? { type: "days", dates: next } : null);
   };
 
   const handleWholeMonth = () => {
-    if (isSelectedMonth && selectedDay === null) {
-      onSelect(null);
-    } else {
-      onSelect({ year: viewYear, month: viewMonth, day: null });
-    }
+    onSelect(
+      isWholeMonthActive ? null : { type: "month", year: viewYear, month: viewMonth },
+    );
   };
 
   const totalDays = daysInMonth(viewYear, viewMonth);
@@ -124,9 +139,7 @@ export default function CalendarPanel({ selected, onSelect }) {
           </button>
           <button
             type="button"
-            className={`calendar-month-label ${
-              isSelectedMonth && selectedDay === null ? "active" : ""
-            }`}
+            className={`calendar-month-label ${isWholeMonthActive ? "active" : ""}`}
             onClick={handleWholeMonth}
             title="Filtra per tutto il mese"
           >
@@ -152,8 +165,9 @@ export default function CalendarPanel({ selected, onSelect }) {
       <div className="calendar-grid">
         {cells.map((day, i) => {
           if (day === null) return <span key={`empty-${i}`} />;
-          const count = counts[toISODate(viewYear, viewMonth, day)] || 0;
-          const active = selectedDay === day;
+          const iso = toISODate(viewYear, viewMonth, day);
+          const count = counts[iso] || 0;
+          const active = selectedDates.includes(iso);
           return (
             <button
               type="button"
@@ -161,7 +175,7 @@ export default function CalendarPanel({ selected, onSelect }) {
               className={`calendar-day ${active ? "active" : ""} ${
                 isToday(day) ? "today" : ""
               }`}
-              onClick={() => handleDayClick(day)}
+              onClick={() => toggleDay(day)}
               aria-pressed={active}
               aria-label={`${day} ${MESI[viewMonth - 1]}${
                 count ? `, ${count} attività` : ""
@@ -173,6 +187,27 @@ export default function CalendarPanel({ selected, onSelect }) {
           );
         })}
       </div>
+
+      <p className="calendar-hint">
+        Seleziona uno o più giorni, anche cambiando mese, per vederli insieme.
+      </p>
+
+      {selectedDates.length > 0 && (
+        <div className="calendar-chip-row">
+          {selectedDates.map((iso) => (
+            <span className="calendar-chip" key={iso}>
+              {formatChip(iso)}
+              <button
+                type="button"
+                onClick={() => removeDate(iso)}
+                aria-label={`Rimuovi ${formatChip(iso)} dal filtro`}
+              >
+                <IconX />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
 
       {selected && (
         <button type="button" className="btn-link" onClick={() => onSelect(null)}>

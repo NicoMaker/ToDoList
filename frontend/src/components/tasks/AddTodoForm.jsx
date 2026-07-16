@@ -1,6 +1,6 @@
 import { useState } from "react";
 import PrioritySegment from "./PrioritySegment";
-import { IconPlus, IconPin, IconCalendar } from "./Icons";
+import { IconPlus, IconPin, IconCalendar } from "../icons/Icons";
 
 /**
  * Form "Nuova attività". Gestisce internamente i propri campi

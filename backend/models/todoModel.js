@@ -42,7 +42,16 @@ const TodoModel = {
    * - year, month: filtra per mese/anno di scadenza (month 1-12), usati
    *   dalla vista calendario quando non è selezionato un giorno preciso
    */
-  findAll({ completed, priority, search, location, date, year, month } = {}) {
+  findAll({
+    completed,
+    priority,
+    search,
+    location,
+    date,
+    dates,
+    year,
+    month,
+  } = {}) {
     let sql = "SELECT * FROM todos WHERE 1=1";
     const params = [];
 
@@ -62,7 +71,14 @@ const TodoModel = {
       sql += " AND location = ?";
       params.push(location);
     }
-    if (date) {
+
+    // "dates" (elenco di più giorni precisi) ha priorità su tutto il resto
+    // dei filtri temporali: permette di selezionare più giorni sparsi nel
+    // calendario e vedere insieme le attività di quei giorni.
+    if (dates && dates.length > 0) {
+      sql += ` AND due_date IN (${dates.map(() => "?").join(",")})`;
+      params.push(...dates);
+    } else if (date) {
       sql += " AND due_date = ?";
       params.push(date);
     } else {

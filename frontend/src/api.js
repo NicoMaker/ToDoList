@@ -10,7 +10,11 @@ async function handleResponse(res) {
 
 export const api = {
   getAll: (params = {}) => {
-    const query = new URLSearchParams(params).toString();
+    const normalized = { ...params };
+    if (Array.isArray(normalized.dates)) {
+      normalized.dates = normalized.dates.join(",");
+    }
+    const query = new URLSearchParams(normalized).toString();
     return fetch(`${BASE_URL}${query ? `?${query}` : ""}`).then(handleResponse);
   },
 
