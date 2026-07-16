@@ -4,46 +4,33 @@
   padding: 0;
 }
 
-/* Gli SVG sono inline di default: questo lascia un piccolo spazio sotto
-   la baseline che li fa apparire "non allineati" dentro i bottoni icona
-   (es. le frecce avanti/indietro del calendario). display:block li
-   centra perfettamente dentro qualsiasi contenitore flex/grid. */
 svg {
   display: block;
 }
 
 :root {
-  /* Superfici — carta da scrivania */
   --paper: #ede7d8;
   --card: #fbf8f1;
   --card-2: #f3eee0;
   --line: #ddd2b8;
-
-  /* Inchiostro */
   --ink: #2a2521;
   --muted: #7d7566;
-
-  /* Accento principale — inchiostro verde pino */
   --accent: #2f5d50;
   --accent-deep: #1e3f37;
   --accent-soft: #dfece6;
   --accent-glow: rgba(47, 93, 80, 0.24);
-
-  /* Priorità — timbri a ceralacca */
   --alta: #a6432e;
   --alta-soft: #f4e3dd;
   --media: #b07a26;
   --media-soft: #f2e6c9;
   --bassa: #55763f;
   --bassa-soft: #e7eedc;
-
   --radius: 14px;
   --radius-lg: 20px;
   --shadow-card:
     0 1px 2px rgba(42, 37, 33, 0.06), 0 8px 20px rgba(42, 37, 33, 0.08);
   --shadow-pop: 0 14px 30px rgba(42, 37, 33, 0.14);
   --ease-spring: cubic-bezier(0.34, 1.45, 0.44, 1);
-
   --font-display: "Fraunces", "Iowan Old Style", serif;
   --font-body: "Inter", system-ui, -apple-system, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
@@ -88,8 +75,6 @@ button {
   border-radius: 6px;
 }
 
-/* ---------- Luce ambientale ---------- */
-
 .bg-blob {
   position: fixed;
   border-radius: 50%;
@@ -114,14 +99,8 @@ button {
   height: 420px;
   bottom: -160px;
   left: -140px;
-  background: radial-gradient(
-    circle,
-    rgba(47, 93, 80, 0.14),
-    transparent 70%
-  );
+  background: radial-gradient(circle, rgba(47, 93, 80, 0.14), transparent 70%);
 }
-
-/* ---------- Layout ---------- */
 
 .app {
   position: relative;
@@ -172,8 +151,6 @@ button {
   gap: clamp(18px, 3vw, 32px);
   align-items: start;
 }
-
-/* ---------- Colonna laterale ---------- */
 
 .side-panel {
   display: flex;
@@ -245,7 +222,6 @@ button {
   box-shadow: 0 0 0 4px var(--accent-soft);
 }
 
-/* Selettore priorità a segmenti — puntini a ceralacca */
 .priority-segment {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -307,7 +283,6 @@ button {
   font-size: 0.8rem;
 }
 
-/* Bottoni */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -359,7 +334,6 @@ button {
   text-decoration: underline;
 }
 
-/* Progressi — timbro ad anello */
 .progress-row {
   display: flex;
   align-items: center;
@@ -420,7 +394,47 @@ button {
   color: var(--muted);
 }
 
-/* ---------- Toolbar ---------- */
+/* ----- Aggiunte per le azioni di massa ----- */
+.bulk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.bulk-actions .btn-link {
+  margin: 0;
+  font-size: 0.85rem;
+}
+.bulk-actions .danger-link {
+  color: var(--alta);
+}
+.bulk-actions .danger-link:hover {
+  color: #a6432e;
+}
+
+/* ----- Frecce del calendario più visibili e allineate ----- */
+.calendar-nav .icon-btn {
+  color: var(--ink);
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  transition:
+    background 0.2s,
+    transform 0.2s;
+}
+.calendar-nav .icon-btn:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  transform: scale(1.05);
+}
+.calendar-nav .icon-btn svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
+/* ----- Resto del CSS invariato (toolbar, todo, calendar, etc.) ----- */
 
 .toolbar {
   display: flex;
@@ -489,8 +503,6 @@ button {
   color: #fff;
 }
 
-/* ---------- Lista attività ---------- */
-
 .error-banner {
   background: var(--alta-soft);
   border: 1px solid rgba(166, 67, 46, 0.3);
@@ -518,8 +530,6 @@ button {
   }
 }
 
-/* Schede pinnate a bacheca: leggera rotazione alternata, si raddrizzano
-   e si sollevano al passaggio del mouse per restare leggibili */
 .todo-card {
   position: relative;
   display: flex;
@@ -548,7 +558,6 @@ button {
   transform: rotate(0deg) translateY(-3px);
   box-shadow: var(--shadow-pop);
 }
-/* Spillo colorato per priorità, nell'angolo in alto a sinistra */
 .todo-card::before {
   content: "";
   position: absolute;
@@ -575,7 +584,6 @@ button {
   color: var(--muted);
 }
 
-/* Checkbox personalizzato */
 .check {
   flex-shrink: 0;
   width: 26px;
@@ -633,13 +641,11 @@ button {
   position: relative;
   transition: color 0.25s;
 }
-/* Barratura al completamento (segue anche i titoli su più righe) */
 .todo-card.completed .todo-title {
   text-decoration: line-through;
   text-decoration-thickness: 2px;
 }
 
-/* Chip priorità — timbro a ceralacca */
 .priority-chip {
   display: inline-flex;
   align-items: center;
@@ -726,7 +732,6 @@ button {
   border-color: rgba(166, 67, 46, 0.35);
 }
 
-/* Modalità modifica */
 .edit-mode {
   flex: 1;
   display: flex;
@@ -754,7 +759,6 @@ button {
   font-size: 0.88rem;
 }
 
-/* Stato vuoto */
 .empty-state {
   text-align: center;
   padding: 56px 20px;
@@ -777,8 +781,6 @@ button {
 .empty-sub {
   font-size: 0.92rem;
 }
-
-/* ---------- Responsive ---------- */
 
 @media (max-width: 860px) {
   .board {
@@ -813,8 +815,6 @@ button {
   }
 }
 
-/* ---------- Accessibilità ---------- */
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -828,8 +828,6 @@ button {
     transform: none;
   }
 }
-
-/* ---------- Finestra di conferma ---------- */
 
 @keyframes overlay-in {
   from {
@@ -921,8 +919,6 @@ button {
   transform: translateY(0) scale(0.98);
 }
 
-/* ---------- Campi con icona (data / luogo) nel form e in modifica ---------- */
-
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -959,8 +955,6 @@ button {
   box-shadow: none !important;
 }
 
-/* ---------- Meta chip (scadenza, luogo) sulla card attività ---------- */
-
 .todo-meta-row {
   display: flex;
   flex-wrap: wrap;
@@ -986,7 +980,6 @@ button {
   background: var(--accent-soft);
   border-color: rgba(47, 93, 80, 0.2);
 }
-/* Timbro di viaggio per il luogo: bordo tratteggiato, leggera rotazione */
 .meta-location {
   color: #7a5613;
   background: var(--media-soft);
@@ -999,8 +992,6 @@ button {
   font-size: 0.78rem;
   font-family: var(--font-mono);
 }
-
-/* ---------- Filtro per luogo nella toolbar ---------- */
 
 .location-filter {
   display: flex;
@@ -1025,28 +1016,32 @@ button {
   outline: none;
 }
 
-/* ---------- Calendario — griglia di timbri postali ---------- */
-
 .calendar-panel {
   padding: 20px 22px 22px;
 }
 .calendar-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
+  gap: 8px 10px;
   margin-bottom: 14px;
 }
 .calendar-title {
   margin-bottom: 0;
+  min-width: 0;
 }
 .calendar-nav {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
   gap: 4px;
+  margin-left: auto;
 }
 .calendar-nav .icon-btn {
   width: 28px;
   height: 28px;
+  flex-shrink: 0;
 }
 .calendar-month-label {
   font-family: var(--font-mono);
@@ -1055,11 +1050,12 @@ button {
   font-size: 0.78rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   color: var(--ink);
-  padding: 5px 10px;
+  padding: 5px 8px;
   border-radius: 8px;
   white-space: nowrap;
+  flex-shrink: 0;
   transition:
     background 0.2s,
     color 0.2s;
@@ -1110,14 +1106,12 @@ button {
 .calendar-day:hover {
   background: var(--card-2);
 }
-/* "Oggi" — anello tratteggiato, come un timbro postale in attesa */
 .calendar-day.today {
   font-weight: 600;
   color: var(--accent);
   border-color: var(--accent);
   border-style: dashed;
 }
-/* Giorno selezionato — timbro pieno */
 .calendar-day.active {
   background: var(--accent);
   border-color: var(--accent);
@@ -1185,9 +1179,19 @@ button {
   .form-row {
     grid-template-columns: 1fr;
   }
+  .calendar-title {
+    font-size: 1rem;
+    gap: 7px;
+  }
+  .calendar-nav .icon-btn {
+    width: 26px;
+    height: 26px;
+  }
+  .calendar-month-label {
+    font-size: 0.72rem;
+    padding: 4px 6px;
+  }
 }
-
-/* ---------- Navigazione data nell'header ---------- */
 
 .masthead-nav {
   display: flex;
@@ -1226,8 +1230,6 @@ button {
   white-space: nowrap;
 }
 
-/* ---------- Bottone "Nuovo evento" nella sidebar ---------- */
-
 .new-event-hint {
   color: var(--muted);
   font-size: 0.85rem;
@@ -1237,8 +1239,6 @@ button {
 .btn-block {
   width: 100%;
 }
-
-/* ---------- Finestra modale "Nuovo evento" ---------- */
 
 .modal {
   position: relative;
@@ -1264,8 +1264,6 @@ button {
 .event-modal .panel-label {
   padding-right: 36px;
 }
-
-/* ---------- Filtro priorità (selezione multipla) nella toolbar ---------- */
 
 .priority-filter-group {
   display: flex;
@@ -1317,8 +1315,6 @@ button {
   background: var(--bassa-soft);
   color: var(--bassa);
 }
-
-/* ---------- Pannello statistiche ---------- */
 
 .stats-panel {
   margin-bottom: 18px;

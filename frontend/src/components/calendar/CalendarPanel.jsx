@@ -8,8 +8,18 @@ import {
 } from "../icons/Icons";
 
 const MESI = [
-  "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
-  "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre",
+  "Gennaio",
+  "Febbraio",
+  "Marzo",
+  "Aprile",
+  "Maggio",
+  "Giugno",
+  "Luglio",
+  "Agosto",
+  "Settembre",
+  "Ottobre",
+  "Novembre",
+  "Dicembre",
 ];
 const GIORNI_SETTIMANA = ["L", "M", "M", "G", "V", "S", "D"];
 
@@ -119,7 +129,9 @@ export default function CalendarPanel({ selected, onSelect }) {
 
   const handleWholeMonth = () => {
     onSelect(
-      isWholeMonthActive ? null : { type: "month", year: viewYear, month: viewMonth },
+      isWholeMonthActive
+        ? null
+        : { type: "month", year: viewYear, month: viewMonth },
     );
   };
 
@@ -194,7 +206,9 @@ export default function CalendarPanel({ selected, onSelect }) {
               }`}
             >
               {day}
-              {count > 0 && <span className="calendar-dot" aria-hidden="true" />}
+              {count > 0 && (
+                <span className="calendar-dot" aria-hidden="true" />
+              )}
             </button>
           );
         })}
@@ -222,7 +236,11 @@ export default function CalendarPanel({ selected, onSelect }) {
       )}
 
       {selected && (
-        <button type="button" className="btn-link" onClick={() => onSelect(null)}>
+        <button
+          type="button"
+          className="btn-link"
+          onClick={() => onSelect(null)}
+        >
           Rimuovi filtro data
         </button>
       )}

@@ -1,6 +1,12 @@
 import { useState } from "react";
 import PrioritySegment from "./PrioritySegment";
-import { IconCheck, IconEdit, IconTrash, IconPin, IconCalendar } from "../icons/Icons";
+import {
+  IconCheck,
+  IconEdit,
+  IconTrash,
+  IconPin,
+  IconCalendar,
+} from "../icons/Icons";
 
 /** Formatta una data YYYY-MM-DD in "gg mese" leggibile, in italiano */
 function formatDueDate(dueDate) {

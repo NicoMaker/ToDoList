@@ -1,10 +1,14 @@
-// ============================================================
-// server.js — Punto di ingresso: avvia il server HTTP
-// ============================================================
-const app = require("./app");
+const { migrationPromise } = require("./config/database");
 
-const PORT = process.env.PORT || 3001;
-
-app.listen(PORT, () => {
-  console.log(`Server in ascolto su http://localhost:${PORT}`);
-});
+migrationPromise
+  .then(() => {
+    const app = require("./app");
+    const PORT = process.env.PORT || 3001;
+    app.listen(PORT, () => {
+      console.log(`Server in ascolto su http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Impossibile avviare il server:", err.message);
+    process.exit(1);
+  });

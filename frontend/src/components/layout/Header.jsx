@@ -1,4 +1,8 @@
-import { IconChevronLeft, IconChevronRight, IconCalendar } from "../icons/Icons";
+import {
+  IconChevronLeft,
+  IconChevronRight,
+  IconCalendar,
+} from "../icons/Icons";
 
 function pad2(n) {
   return String(n).padStart(2, "0");
@@ -30,7 +34,13 @@ function formatFocusDate(iso) {
  * - onPickDate(iso): salta a una data scelta dal selettore
  * - onToday: torna al giorno odierno
  */
-export default function Header({ focusDate, onPrevDay, onNextDay, onPickDate, onToday }) {
+export default function Header({
+  focusDate,
+  onPrevDay,
+  onNextDay,
+  onPickDate,
+  onToday,
+}) {
   const isToday = focusDate === todayISO();
 
   return (
@@ -67,7 +77,11 @@ export default function Header({ focusDate, onPrevDay, onNextDay, onPickDate, on
           </button>
 
           {!isToday && (
-            <button type="button" className="btn-link masthead-today" onClick={onToday}>
+            <button
+              type="button"
+              className="btn-link masthead-today"
+              onClick={onToday}
+            >
               Oggi
             </button>
           )}

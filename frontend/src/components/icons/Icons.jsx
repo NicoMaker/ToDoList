@@ -128,7 +128,13 @@ export const IconCalendar = ({ width = 16, height = 16 }) => (
 );
 
 export const IconChevronLeft = () => (
-  <svg viewBox="0 0 24 24" fill="none" width="18" height="18" aria-hidden="true">
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    width="18"
+    height="18"
+    aria-hidden="true"
+  >
     <path
       d="M15 6l-6 6 6 6"
       stroke="currentColor"
@@ -140,7 +146,13 @@ export const IconChevronLeft = () => (
 );
 
 export const IconX = ({ width = 12, height = 12 }) => (
-  <svg viewBox="0 0 24 24" fill="none" width={width} height={height} aria-hidden="true">
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    width={width}
+    height={height}
+    aria-hidden="true"
+  >
     <path
       d="M6 6l12 12M18 6L6 18"
       stroke="currentColor"
@@ -169,7 +181,13 @@ export const IconChart = () => (
 );
 
 export const IconChevronRight = () => (
-  <svg viewBox="0 0 24 24" fill="none" width="18" height="18" aria-hidden="true">
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    width="18"
+    height="18"
+    aria-hidden="true"
+  >
     <path
       d="M9 6l6 6-6 6"
       stroke="currentColor"

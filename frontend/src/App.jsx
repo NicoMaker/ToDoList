@@ -14,54 +14,38 @@ function pad2(n) {
   return String(n).padStart(2, "0");
 }
 
-/** Data di oggi in formato YYYY-MM-DD */
 function todayISO() {
   const d = new Date();
   return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
 }
 
-/** Somma (o sottrae) giorni a una data ISO YYYY-MM-DD */
 function addDaysISO(iso, delta) {
   const d = new Date(`${iso}T00:00:00`);
   d.setDate(d.getDate() + delta);
   return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
 }
 
-/**
- * App: unica fonte di verità per i dati.
- * Tiene lo stato (todos, filtri, errori), parla con l'API e
- * passa dati + callback ai componenti figli.
- */
 export default function App() {
   const [todos, setTodos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [filter, setFilter] = useState("tutti"); // tutti | attivi | completati
+  const [filter, setFilter] = useState("tutti");
   const [search, setSearch] = useState("");
-
-  // Filtro luogo (dove è stata creata l'attività) + elenco per la tendina
   const [locationFilter, setLocationFilter] = useState("");
   const [locations, setLocations] = useState([]);
-
-  // Filtro priorità: selezione multipla (alta/media/bassa). Vuoto = tutte.
   const [priorityFilter, setPriorityFilter] = useState([]);
-
-  // Filtro data dal calendario: { year, month, day|null, iso? } oppure null
   const [dateFilter, setDateFilter] = useState(null);
-
-  // Data "a fuoco" mostrata in alto nell'header, navigabile avanti/indietro
   const [focusDate, setFocusDate] = useState(todayISO);
-
-  // Finestra modale "Nuovo evento"
   const [modalOpen, setModalOpen] = useState(false);
+  const [confirm, setConfirm] = useState(null);
 
   const loadLocations = useCallback(async () => {
     try {
       const data = await api.getLocations();
       setLocations(data);
     } catch {
-      // Non blocchiamo l'app se il filtro luoghi non si carica
+      // ignora
     }
   }, []);
 
@@ -73,7 +57,6 @@ export default function App() {
       if (filter === "completati") params.completed = "true";
       if (search.trim()) params.search = search.trim();
       if (locationFilter) params.location = locationFilter;
-
       if (dateFilter) {
         if (dateFilter.type === "days") {
           params.dates = dateFilter.dates.join(",");
@@ -82,7 +65,6 @@ export default function App() {
           params.month = dateFilter.month;
         }
       }
-
       const data = await api.getAll(params);
       setTodos(data);
     } catch (e) {
@@ -93,7 +75,7 @@ export default function App() {
   }, [filter, search, locationFilter, dateFilter]);
 
   useEffect(() => {
-    const t = setTimeout(loadTodos, 250); // debounce ricerca
+    const t = setTimeout(loadTodos, 250);
     return () => clearTimeout(t);
   }, [loadTodos]);
 
@@ -101,7 +83,6 @@ export default function App() {
     loadLocations();
   }, [loadLocations]);
 
-  /** Esegue un'azione API, ricarica la lista e ritorna true se ok. */
   const run = async (action) => {
     try {
       await action();
@@ -117,17 +98,11 @@ export default function App() {
   const handleToggle = (id) => run(() => api.toggle(id));
   const handleUpdate = (id, fields) => run(() => api.update(id, fields));
 
-  // ---- Filtro priorità: applicato lato client sui risultati già
-  // filtrati dal server, così si possono selezionare più priorità insieme
-  // (es. "alta" e "media") e vedere tutti i casi corrispondenti. ----
   const visibleTodos = useMemo(() => {
     if (priorityFilter.length === 0) return todos;
     return todos.filter((t) => priorityFilter.includes(t.priority || "media"));
   }, [todos, priorityFilter]);
 
-  // ---- Navigazione data in alto (header): avanti/indietro di un
-  // giorno, o salto diretto a una data scelta. Filtra la lista su quel
-  // singolo giorno. ----
   const jumpToDate = (iso) => {
     setFocusDate(iso);
     setDateFilter({ type: "days", dates: [iso] });
@@ -135,10 +110,7 @@ export default function App() {
   const shiftFocusDate = (delta) => jumpToDate(addDaysISO(focusDate, delta));
   const goToday = () => jumpToDate(todayISO());
 
-  // ---- Eliminazioni con conferma ----
-  // confirm = null oppure { title, message, confirmLabel, action }
-  const [confirm, setConfirm] = useState(null);
-
+  // ----- Azioni di massa -----
   const askDelete = (todo) =>
     setConfirm({
       title: "Eliminare questa attività?",
@@ -150,9 +122,48 @@ export default function App() {
   const askClearCompleted = () =>
     setConfirm({
       title: "Eliminare le attività completate?",
-      message: `${completedCount} attività completate verranno eliminate definitivamente. L'operazione non si può annullare.`,
+      message: `${completedCount} attività completate verranno eliminate definitivamente.`,
       confirmLabel: "Elimina tutte",
       action: () => api.clearCompleted(),
+    });
+
+  const askClearAll = () =>
+    setConfirm({
+      title: "Eliminare tutte le attività?",
+      message: `Saranno eliminate tutte le ${totalCount} attività. Operazione irreversibile.`,
+      confirmLabel: "Elimina tutte",
+      action: () => api.clearAll(),
+    });
+
+  const askClearActive = () =>
+    setConfirm({
+      title: "Eliminare le attività da fare?",
+      message: `${activeCount} attività non completate verranno eliminate. Continuare?`,
+      confirmLabel: "Elimina da fare",
+      action: () => api.clearActive(),
+    });
+
+  const askClearFiltered = () =>
+    setConfirm({
+      title: "Eliminare le attività filtrate?",
+      message: `${visibleTodos.length} attività visibili verranno eliminate. Continuare?`,
+      confirmLabel: "Elimina filtrate",
+      action: () => {
+        const params = {};
+        if (filter === "attivi") params.completed = "false";
+        if (filter === "completati") params.completed = "true";
+        if (search.trim()) params.search = search.trim();
+        if (locationFilter) params.location = locationFilter;
+        if (dateFilter) {
+          if (dateFilter.type === "days")
+            params.dates = dateFilter.dates.join(",");
+          else if (dateFilter.type === "month") {
+            params.year = dateFilter.year;
+            params.month = dateFilter.month;
+          }
+        }
+        return api.clearFiltered(params);
+      },
     });
 
   const handleConfirm = async () => {
@@ -163,6 +174,7 @@ export default function App() {
 
   const activeCount = visibleTodos.filter((t) => !t.completed).length;
   const completedCount = visibleTodos.filter((t) => t.completed).length;
+  const totalCount = visibleTodos.length;
   const isFiltered =
     filter !== "tutti" ||
     search.trim() !== "" ||
@@ -210,7 +222,13 @@ export default function App() {
           <ProgressCard
             activeCount={activeCount}
             completedCount={completedCount}
+            totalCount={totalCount}
+            isFiltered={isFiltered}
+            filteredCount={visibleTodos.length}
             onClearCompleted={askClearCompleted}
+            onClearAll={askClearAll}
+            onClearActive={askClearActive}
+            onClearFiltered={askClearFiltered}
           />
         </aside>
 

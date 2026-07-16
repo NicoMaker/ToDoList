@@ -1,8 +1,7 @@
 // ============================================================
-// models/todoModel.js — Accesso ai dati (tutte le query SQL)
-// Espone funzioni Promise così i controller restano puliti.
+// models/todoModel.js — Accesso ai dati
 // ============================================================
-const db = require("../config/database");
+const { db } = require("../config/database");
 
 /** Wrapper Promise per db.all */
 function all(sql, params = []) {
@@ -28,20 +27,14 @@ function run(sql, params = []) {
   });
 }
 
-/** "5" -> "05" (per confrontare il mese con strftime, che è sempre a 2 cifre) */
+/** "5" -> "05" */
 function pad2(n) {
   return String(n).padStart(2, "0");
 }
 
 const TodoModel = {
-  /**
-   * Lista con filtri opzionali:
-   * - completed, priority, search (esistenti)
-   * - location: luogo esatto in cui è stata creata l'attività
-   * - date: giorno esatto di scadenza, formato YYYY-MM-DD
-   * - year, month: filtra per mese/anno di scadenza (month 1-12), usati
-   *   dalla vista calendario quando non è selezionato un giorno preciso
-   */
+  // ----- METODI ESISTENTI -----
+
   findAll({
     completed,
     priority,
@@ -72,9 +65,6 @@ const TodoModel = {
       params.push(location);
     }
 
-    // "dates" (elenco di più giorni precisi) ha priorità su tutto il resto
-    // dei filtri temporali: permette di selezionare più giorni sparsi nel
-    // calendario e vedere insieme le attività di quei giorni.
     if (dates && dates.length > 0) {
       sql += ` AND due_date IN (${dates.map(() => "?").join(",")})`;
       params.push(...dates);
@@ -96,12 +86,10 @@ const TodoModel = {
     return all(sql, params);
   },
 
-  /** Singolo todo per id (undefined se non esiste) */
   findById(id) {
     return get("SELECT * FROM todos WHERE id = ?", [id]);
   },
 
-  /** Crea un todo e ritorna la riga appena inserita */
   async create({
     title,
     description = "",
@@ -116,10 +104,6 @@ const TodoModel = {
     return TodoModel.findById(lastID);
   },
 
-  /**
-   * Aggiorna un todo esistente (i campi non passati restano invariati).
-   * Ritorna la riga aggiornata, o null se l'id non esiste.
-   */
   async update(
     id,
     { title, description, completed, priority, due_date, location },
@@ -154,7 +138,6 @@ const TodoModel = {
     return TodoModel.findById(id);
   },
 
-  /** Inverte lo stato completato. Ritorna la riga aggiornata o null. */
   async toggle(id) {
     const existing = await TodoModel.findById(id);
     if (!existing) return null;
@@ -166,22 +149,16 @@ const TodoModel = {
     return TodoModel.findById(id);
   },
 
-  /** Elimina un todo. Ritorna true se qualcosa è stato eliminato. */
   async remove(id) {
     const { changes } = await run("DELETE FROM todos WHERE id = ?", [id]);
     return changes > 0;
   },
 
-  /** Elimina tutti i completati. Ritorna quanti ne ha eliminati. */
   async clearCompleted() {
     const { changes } = await run("DELETE FROM todos WHERE completed = 1");
     return changes;
   },
 
-  /**
-   * Conteggio attività per giorno in un dato mese, per popolare i puntini
-   * nel calendario. Ritorna un oggetto { "YYYY-MM-DD": numero }.
-   */
   async countByMonth(year, month) {
     const rows = await all(
       `SELECT due_date, COUNT(*) AS count
@@ -199,7 +176,6 @@ const TodoModel = {
     return map;
   },
 
-  /** Elenco dei luoghi distinti già usati, per il filtro a tendina. */
   async listLocations() {
     const rows = await all(
       `SELECT DISTINCT location FROM todos
@@ -207,6 +183,66 @@ const TodoModel = {
        ORDER BY location COLLATE NOCASE`,
     );
     return rows.map((r) => r.location);
+  },
+
+  // ----- NUOVI METODI DI ELIMINAZIONE DI MASSA -----
+
+  clearAll() {
+    return run("DELETE FROM todos");
+  },
+
+  clearActive() {
+    return run("DELETE FROM todos WHERE completed = 0");
+  },
+
+  clearFiltered({
+    completed,
+    priority,
+    search,
+    location,
+    date,
+    dates,
+    year,
+    month,
+  } = {}) {
+    let sql = "DELETE FROM todos WHERE 1=1";
+    const params = [];
+
+    if (completed !== undefined) {
+      sql += " AND completed = ?";
+      params.push(completed === "true" ? 1 : 0);
+    }
+    if (priority) {
+      sql += " AND priority = ?";
+      params.push(priority);
+    }
+    if (search) {
+      sql += " AND (title LIKE ? OR description LIKE ?)";
+      params.push(`%${search}%`, `%${search}%`);
+    }
+    if (location) {
+      sql += " AND location = ?";
+      params.push(location);
+    }
+
+    if (dates && dates.length > 0) {
+      sql += ` AND due_date IN (${dates.map(() => "?").join(",")})`;
+      params.push(...dates);
+    } else if (date) {
+      sql += " AND due_date = ?";
+      params.push(date);
+    } else {
+      if (year) {
+        sql += " AND strftime('%Y', due_date) = ?";
+        params.push(String(year));
+      }
+      if (month) {
+        sql += " AND strftime('%m', due_date) = ?";
+        params.push(pad2(month));
+      }
+    }
+
+    return run(sql, params);
   },
 };
 

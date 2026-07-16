@@ -24,22 +24,26 @@ function ProgressRing({ done, total }) {
 }
 
 /**
- * Card "I tuoi progressi": anello + contatori, con azione per
- * eliminare tutte le attività completate.
+ * Card "I tuoi progressi": anello, contatori e azioni di massa.
  */
 export default function ProgressCard({
   activeCount,
   completedCount,
+  totalCount,
+  isFiltered,
+  filteredCount,
   onClearCompleted,
+  onClearAll,
+  onClearActive,
+  onClearFiltered,
 }) {
+  const hasFiltered = isFiltered && filteredCount > 0;
+
   return (
     <section className="panel-card progress-card">
       <h2 className="panel-label">I tuoi progressi</h2>
       <div className="progress-row">
-        <ProgressRing
-          done={completedCount}
-          total={activeCount + completedCount}
-        />
+        <ProgressRing done={completedCount} total={totalCount} />
         <div className="stats-col">
           <div className="stat">
             <span className="stat-num">{activeCount}</span>
@@ -51,11 +55,29 @@ export default function ProgressCard({
           </div>
         </div>
       </div>
-      {completedCount > 0 && (
-        <button className="btn-link" onClick={onClearCompleted}>
-          Elimina le attività completate
-        </button>
-      )}
+
+      <div className="bulk-actions">
+        {completedCount > 0 && (
+          <button className="btn-link" onClick={onClearCompleted}>
+            Elimina completate ({completedCount})
+          </button>
+        )}
+        {activeCount > 0 && (
+          <button className="btn-link" onClick={onClearActive}>
+            Elimina da fare ({activeCount})
+          </button>
+        )}
+        {totalCount > 0 && (
+          <button className="btn-link danger-link" onClick={onClearAll}>
+            Elimina tutte ({totalCount})
+          </button>
+        )}
+        {hasFiltered && (
+          <button className="btn-link" onClick={onClearFiltered}>
+            Elimina filtrate ({filteredCount})
+          </button>
+        )}
+      </div>
     </section>
   );
 }

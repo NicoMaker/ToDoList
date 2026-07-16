@@ -43,11 +43,24 @@ export const api = {
       handleResponse,
     ),
 
-  /** Luoghi distinti già usati nelle attività, per il filtro a tendina. */
-  getLocations: () =>
-    fetch(`${BASE_URL}/meta/locations`).then(handleResponse),
+  // ----- NUOVE OPERAZIONI DI MASSA -----
+  clearAll: () =>
+    fetch(`${BASE_URL}/clear/all`, { method: "DELETE" }).then(handleResponse),
 
-  /** Conteggio attività per giorno in un mese: { "YYYY-MM-DD": numero } */
+  clearActive: () =>
+    fetch(`${BASE_URL}/clear/active`, { method: "DELETE" }).then(
+      handleResponse,
+    ),
+
+  clearFiltered: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return fetch(`${BASE_URL}/clear/filtered${query ? `?${query}` : ""}`, {
+      method: "DELETE",
+    }).then(handleResponse);
+  },
+
+  getLocations: () => fetch(`${BASE_URL}/meta/locations`).then(handleResponse),
+
   getCalendarCounts: (year, month) =>
     fetch(`${BASE_URL}/meta/calendar?year=${year}&month=${month}`).then(
       handleResponse,

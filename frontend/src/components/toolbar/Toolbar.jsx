@@ -66,7 +66,11 @@ export default function Toolbar({
         ))}
       </div>
 
-      <div className="priority-filter-group" role="group" aria-label="Filtra per priorità">
+      <div
+        className="priority-filter-group"
+        role="group"
+        aria-label="Filtra per priorità"
+      >
         {PRIORITIES.map((p) => {
           const active = priorityFilter.includes(p.value);
           return (

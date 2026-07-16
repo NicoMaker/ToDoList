@@ -2,7 +2,6 @@
 
 App full-stack completa per gestire una lista di attività, con tutte le operazioni CRUD (crea, leggi, modifica, elimina), calendario per data di scadenza, filtro per luogo e frontend moderno a componenti.
 
-
 ## Come avviare il backend
 
 ```bash
@@ -15,17 +14,17 @@ Il server parte su **http://localhost:3001**. Il database `todos.db` viene creat
 
 ### API disponibili
 
-| Metodo | Endpoint                     | Descrizione                                                                 |
-| ------ | ----------------------------- | ---------------------------------------------------------------------------- |
-| GET    | `/api/todos`                  | Lista todo (filtri: `completed`, `priority`, `search`, `location`, `date`, `dates`, `year`, `month`) |
-| GET    | `/api/todos/:id`               | Dettaglio singolo todo                                                       |
-| POST   | `/api/todos`                   | Crea nuovo todo (`title`, `description`, `priority`, `due_date`, `location`) |
-| PUT    | `/api/todos/:id`                | Modifica un todo esistente                                                   |
-| PATCH  | `/api/todos/:id/toggle`         | Alterna completato/non completato                                            |
-| DELETE | `/api/todos/:id`                | Elimina un todo                                                              |
-| DELETE | `/api/todos/clear/completed`    | Elimina tutti i todo completati                                              |
-| GET    | `/api/todos/meta/locations`     | Elenco dei luoghi distinti già usati (per il filtro a tendina)               |
-| GET    | `/api/todos/meta/calendar`      | Conteggio attività per giorno in un mese (`?year=&month=`)                    |
+| Metodo | Endpoint                     | Descrizione                                                                                          |
+| ------ | ---------------------------- | ---------------------------------------------------------------------------------------------------- |
+| GET    | `/api/todos`                 | Lista todo (filtri: `completed`, `priority`, `search`, `location`, `date`, `dates`, `year`, `month`) |
+| GET    | `/api/todos/:id`             | Dettaglio singolo todo                                                                               |
+| POST   | `/api/todos`                 | Crea nuovo todo (`title`, `description`, `priority`, `due_date`, `location`)                         |
+| PUT    | `/api/todos/:id`             | Modifica un todo esistente                                                                           |
+| PATCH  | `/api/todos/:id/toggle`      | Alterna completato/non completato                                                                    |
+| DELETE | `/api/todos/:id`             | Elimina un todo                                                                                      |
+| DELETE | `/api/todos/clear/completed` | Elimina tutti i todo completati                                                                      |
+| GET    | `/api/todos/meta/locations`  | Elenco dei luoghi distinti già usati (per il filtro a tendina)                                       |
+| GET    | `/api/todos/meta/calendar`   | Conteggio attività per giorno in un mese (`?year=&month=`)                                           |
 
 `date` filtra per un giorno esatto (`YYYY-MM-DD`); `dates` filtra per più giorni insieme (elenco separato da virgole, es. `dates=2026-07-15,2026-07-20`) e ha la precedenza su `date`; `year`/`month` (senza `date`/`dates`) filtrano per l'intero mese — usati dal calendario.
 

@@ -1,7 +1,5 @@
 // ============================================================
 // controllers/todoController.js — Logica delle richieste HTTP
-// Valida l'input, chiama il model e costruisce la risposta.
-// Gli errori vengono passati a next() → errorHandler.
 // ============================================================
 const TodoModel = require("../models/todoModel");
 
@@ -11,11 +9,21 @@ function isValidDate(value) {
 }
 
 const todoController = {
-  /** GET /api/todos — lista con filtri (completed, priority, search, location, date, year, month) */
+  // ----- METODI ESISTENTI -----
+
+  /** GET /api/todos — lista con filtri */
   async list(req, res, next) {
     try {
-      const { completed, priority, search, location, date, dates, year, month } =
-        req.query;
+      const {
+        completed,
+        priority,
+        search,
+        location,
+        date,
+        dates,
+        year,
+        month,
+      } = req.query;
 
       if (date && !isValidDate(date)) {
         return res
@@ -53,7 +61,7 @@ const todoController = {
     }
   },
 
-  /** GET /api/todos/meta/locations — luoghi distinti già usati */
+  /** GET /api/todos/meta/locations */
   async listLocations(req, res, next) {
     try {
       const locations = await TodoModel.listLocations();
@@ -63,14 +71,12 @@ const todoController = {
     }
   },
 
-  /** GET /api/todos/meta/calendar?year=&month= — conteggio attività per giorno */
+  /** GET /api/todos/meta/calendar */
   async calendarCounts(req, res, next) {
     try {
       const { year, month } = req.query;
       if (!year || !month) {
-        return res
-          .status(400)
-          .json({ error: "year e month sono obbligatori" });
+        return res.status(400).json({ error: "year e month sono obbligatori" });
       }
       const counts = await TodoModel.countByMonth(year, month);
       res.json(counts);
@@ -79,7 +85,7 @@ const todoController = {
     }
   },
 
-  /** GET /api/todos/:id — dettaglio singolo */
+  /** GET /api/todos/:id */
   async getOne(req, res, next) {
     try {
       const todo = await TodoModel.findById(req.params.id);
@@ -90,7 +96,7 @@ const todoController = {
     }
   },
 
-  /** POST /api/todos — crea nuovo todo */
+  /** POST /api/todos */
   async create(req, res, next) {
     try {
       const { title, description, priority, due_date, location } = req.body;
@@ -115,7 +121,7 @@ const todoController = {
     }
   },
 
-  /** PUT /api/todos/:id — aggiorna un todo esistente */
+  /** PUT /api/todos/:id */
   async update(req, res, next) {
     try {
       if (req.body.due_date && !isValidDate(req.body.due_date)) {
@@ -131,7 +137,7 @@ const todoController = {
     }
   },
 
-  /** PATCH /api/todos/:id/toggle — inverte completato/da fare */
+  /** PATCH /api/todos/:id/toggle */
   async toggle(req, res, next) {
     try {
       const todo = await TodoModel.toggle(req.params.id);
@@ -142,7 +148,7 @@ const todoController = {
     }
   },
 
-  /** DELETE /api/todos/:id — elimina un todo */
+  /** DELETE /api/todos/:id */
   async remove(req, res, next) {
     try {
       const deleted = await TodoModel.remove(req.params.id);
@@ -156,11 +162,84 @@ const todoController = {
     }
   },
 
-  /** DELETE /api/todos/clear/completed — elimina tutti i completati */
+  /** DELETE /api/todos/clear/completed */
   async clearCompleted(req, res, next) {
     try {
       const count = await TodoModel.clearCompleted();
       res.json({ message: "Todo completati eliminati", count });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  // ----- NUOVI METODI PER ELIMINAZIONE DI MASSA -----
+
+  /** DELETE /api/todos/clear/all */
+  async clearAll(req, res, next) {
+    try {
+      const { changes } = await TodoModel.clearAll();
+      res.json({ message: "Tutte le attività eliminate", count: changes });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /** DELETE /api/todos/clear/active */
+  async clearActive(req, res, next) {
+    try {
+      const { changes } = await TodoModel.clearActive();
+      res.json({ message: "Attività da fare eliminate", count: changes });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /** DELETE /api/todos/clear/filtered */
+  async clearFiltered(req, res, next) {
+    try {
+      const {
+        completed,
+        priority,
+        search,
+        location,
+        date,
+        dates,
+        year,
+        month,
+      } = req.query;
+
+      if (date && !isValidDate(date)) {
+        return res
+          .status(400)
+          .json({ error: "Il parametro date deve avere formato YYYY-MM-DD" });
+      }
+
+      let datesArr;
+      if (dates) {
+        datesArr = String(dates)
+          .split(",")
+          .map((d) => d.trim())
+          .filter(Boolean);
+        const invalid = datesArr.find((d) => !isValidDate(d));
+        if (invalid) {
+          return res.status(400).json({
+            error: `Data non valida in "dates": ${invalid} (atteso YYYY-MM-DD)`,
+          });
+        }
+      }
+
+      const { changes } = await TodoModel.clearFiltered({
+        completed,
+        priority,
+        search,
+        location,
+        date,
+        dates: datesArr,
+        year,
+        month,
+      });
+
+      res.json({ message: "Attività filtrate eliminate", count: changes });
     } catch (err) {
       next(err);
     }
