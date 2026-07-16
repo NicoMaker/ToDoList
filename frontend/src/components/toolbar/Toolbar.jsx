@@ -1,4 +1,5 @@
 import { IconSearch, IconPin } from "../icons/Icons";
+import { PRIORITIES } from "../../constants";
 
 const FILTERS = [
   ["tutti", "Tutte"],
@@ -7,13 +8,17 @@ const FILTERS = [
 ];
 
 /**
- * Barra strumenti: campo di ricerca + filtri a pillola + filtro per luogo.
+ * Barra strumenti: campo di ricerca + filtri a pillola + filtro priorità
+ * (selezione multipla: alta/media/bassa, anche più di una insieme) +
+ * filtro per luogo.
  *
  * Props:
  * - search, onSearchChange
  * - filter ("tutti" | "attivi" | "completati"), onFilterChange
  * - locations: elenco dei luoghi distinti già usati
  * - locationFilter, onLocationFilterChange
+ * - priorityFilter: array di priorità selezionate (vuoto = tutte)
+ * - onPriorityFilterChange(nextArray)
  */
 export default function Toolbar({
   search,
@@ -23,7 +28,17 @@ export default function Toolbar({
   locations = [],
   locationFilter = "",
   onLocationFilterChange,
+  priorityFilter = [],
+  onPriorityFilterChange,
 }) {
+  const togglePriority = (value) => {
+    if (priorityFilter.includes(value)) {
+      onPriorityFilterChange(priorityFilter.filter((p) => p !== value));
+    } else {
+      onPriorityFilterChange([...priorityFilter, value]);
+    }
+  };
+
   return (
     <div className="toolbar">
       <div className="search-box">
@@ -49,6 +64,25 @@ export default function Toolbar({
             {label}
           </button>
         ))}
+      </div>
+
+      <div className="priority-filter-group" role="group" aria-label="Filtra per priorità">
+        {PRIORITIES.map((p) => {
+          const active = priorityFilter.includes(p.value);
+          return (
+            <button
+              key={p.value}
+              type="button"
+              aria-pressed={active}
+              className={`priority-filter-btn prio-${p.value} ${active ? "active" : ""}`}
+              onClick={() => togglePriority(p.value)}
+              title={`Priorità ${p.label.toLowerCase()}`}
+            >
+              <span className="priority-filter-dot" aria-hidden="true" />
+              {p.label}
+            </button>
+          );
+        })}
       </div>
 
       {locations.length > 0 && (

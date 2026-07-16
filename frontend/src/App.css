@@ -4,6 +4,14 @@
   padding: 0;
 }
 
+/* Gli SVG sono inline di default: questo lascia un piccolo spazio sotto
+   la baseline che li fa apparire "non allineati" dentro i bottoni icona
+   (es. le frecce avanti/indietro del calendario). display:block li
+   centra perfettamente dentro qualsiasi contenitore flex/grid. */
+svg {
+  display: block;
+}
+
 :root {
   /* Superfici — carta da scrivania */
   --paper: #ede7d8;
@@ -1176,5 +1184,264 @@ button {
 @media (max-width: 640px) {
   .form-row {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Navigazione data nell'header ---------- */
+
+.masthead-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.masthead-nav .icon-btn {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+}
+.masthead-date-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  cursor: pointer;
+  border-radius: 6px;
+}
+.masthead-date-field .masthead-date {
+  margin-bottom: 0;
+}
+.masthead-date-field input[type="date"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+.masthead-today {
+  margin-top: 0;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+/* ---------- Bottone "Nuovo evento" nella sidebar ---------- */
+
+.new-event-hint {
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+.btn-block {
+  width: 100%;
+}
+
+/* ---------- Finestra modale "Nuovo evento" ---------- */
+
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  text-align: left;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 26px 24px 24px;
+  box-shadow: 0 24px 64px rgba(42, 37, 33, 0.3);
+  animation: dialog-in 0.3s var(--ease-spring) both;
+}
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+}
+.event-modal .panel-label {
+  padding-right: 36px;
+}
+
+/* ---------- Filtro priorità (selezione multipla) nella toolbar ---------- */
+
+.priority-filter-group {
+  display: flex;
+  gap: 4px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  padding: 4px;
+  box-shadow: var(--shadow-card);
+}
+.priority-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.priority-filter-btn:hover {
+  color: var(--ink);
+}
+.priority-filter-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.4;
+  flex-shrink: 0;
+}
+.priority-filter-btn.active .priority-filter-dot {
+  opacity: 1;
+}
+.priority-filter-btn.prio-alta.active {
+  background: var(--alta-soft);
+  color: var(--alta);
+}
+.priority-filter-btn.prio-media.active {
+  background: var(--media-soft);
+  color: var(--media);
+}
+.priority-filter-btn.prio-bassa.active {
+  background: var(--bassa-soft);
+  color: var(--bassa);
+}
+
+/* ---------- Pannello statistiche ---------- */
+
+.stats-panel {
+  margin-bottom: 18px;
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 28px;
+}
+.stats-block-title {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.bar-chart-h {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.bar-row {
+  display: grid;
+  grid-template-columns: 44px 1fr 20px;
+  align-items: center;
+  gap: 10px;
+}
+.bar-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.bar-track {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  min-width: 2px;
+  transition: width 0.5s var(--ease-spring);
+}
+.bar-fill.prio-alta {
+  background: var(--alta);
+}
+.bar-fill.prio-media {
+  background: var(--media);
+}
+.bar-fill.prio-bassa {
+  background: var(--bassa);
+}
+.bar-count {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: right;
+}
+
+.bar-chart-v {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 104px;
+}
+.vbar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  gap: 4px;
+}
+.vbar-count {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--accent);
+  min-height: 12px;
+}
+.vbar-track {
+  width: 100%;
+  max-width: 22px;
+  height: 56px;
+  display: flex;
+  align-items: flex-end;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.vbar-fill {
+  width: 100%;
+  background: linear-gradient(180deg, var(--accent), var(--accent-deep));
+  border-radius: 6px 6px 0 0;
+  min-height: 2px;
+  transition: height 0.5s var(--ease-spring);
+}
+.vbar-day {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+@media (max-width: 640px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+  .masthead-today {
+    margin-left: 2px;
+  }
+}
+
+@media (max-width: 420px) {
+  .masthead-date {
+    font-size: 0.7rem;
   }
 }

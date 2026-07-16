@@ -7,8 +7,20 @@ import { IconPlus, IconPin, IconCalendar } from "../icons/Icons";
  * e chiama onCreate({ title, description, priority, due_date, location })
  * al submit. defaultDate, se passato, precompila il campo data
  * (usato quando l'utente crea un'attività da un giorno del calendario).
+ *
+ * Props aggiuntive:
+ * - title: intestazione del pannello (default "Nuova attività")
+ * - bare: se true, non avvolge il form nella propria panel-card
+ *   (usato dentro EventModal, che fornisce già la propria cornice)
+ * - submitLabel: testo del bottone di invio
  */
-export default function AddTodoForm({ onCreate, defaultDate }) {
+export default function AddTodoForm({
+  onCreate,
+  defaultDate,
+  title: heading = "Nuova attività",
+  bare = false,
+  submitLabel = "Aggiungi attività",
+}) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("media");
@@ -34,9 +46,9 @@ export default function AddTodoForm({ onCreate, defaultDate }) {
     }
   };
 
-  return (
-    <section className="panel-card">
-      <h2 className="panel-label">Nuova attività</h2>
+  const formContent = (
+    <>
+      <h2 className="panel-label">{heading}</h2>
       <form className="add-form" onSubmit={handleSubmit}>
         <input
           type="text"
@@ -78,9 +90,12 @@ export default function AddTodoForm({ onCreate, defaultDate }) {
         <PrioritySegment value={priority} onChange={setPriority} />
         <button type="submit" className="btn btn-primary">
           <IconPlus />
-          Aggiungi attività
+          {submitLabel}
         </button>
       </form>
-    </section>
+    </>
   );
+
+  if (bare) return formContent;
+  return <section className="panel-card">{formContent}</section>;
 }

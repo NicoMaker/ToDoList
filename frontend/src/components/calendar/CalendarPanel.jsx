@@ -68,6 +68,18 @@ export default function CalendarPanel({ selected, onSelect }) {
     loadCounts();
   }, [loadCounts]);
 
+  // Se da fuori (es. le frecce avanti/indietro nell'header) viene impostato
+  // un singolo giorno selezionato che cade in un mese diverso da quello
+  // visualizzato, il calendario salta automaticamente a quel mese.
+  useEffect(() => {
+    if (selected?.type === "days" && selected.dates.length === 1) {
+      const [y, m] = selected.dates[0].split("-").map(Number);
+      setViewYear((prevY) => (prevY === y ? prevY : y));
+      setViewMonth((prevM) => (prevM === m ? prevM : m));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected?.type === "days" ? selected.dates[0] : null]);
+
   const changeMonth = (delta) => {
     let m = viewMonth + delta;
     let y = viewYear;

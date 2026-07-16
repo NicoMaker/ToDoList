@@ -1,12 +1,31 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { api } from "./api";
 import Header from "./components/layout/Header";
-import AddTodoForm from "./components/tasks/AddTodoForm";
+import EventModal from "./components/tasks/EventModal";
 import ProgressCard from "./components/feedback/ProgressCard";
 import CalendarPanel from "./components/calendar/CalendarPanel";
 import Toolbar from "./components/toolbar/Toolbar";
 import TodoList from "./components/tasks/TodoList";
+import StatsPanel from "./components/stats/StatsPanel";
 import ConfirmDialog from "./components/feedback/ConfirmDialog";
+import { IconPlus } from "./components/icons/Icons";
+
+function pad2(n) {
+  return String(n).padStart(2, "0");
+}
+
+/** Data di oggi in formato YYYY-MM-DD */
+function todayISO() {
+  const d = new Date();
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+}
+
+/** Somma (o sottrae) giorni a una data ISO YYYY-MM-DD */
+function addDaysISO(iso, delta) {
+  const d = new Date(`${iso}T00:00:00`);
+  d.setDate(d.getDate() + delta);
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+}
 
 /**
  * App: unica fonte di verità per i dati.
@@ -25,8 +44,17 @@ export default function App() {
   const [locationFilter, setLocationFilter] = useState("");
   const [locations, setLocations] = useState([]);
 
+  // Filtro priorità: selezione multipla (alta/media/bassa). Vuoto = tutte.
+  const [priorityFilter, setPriorityFilter] = useState([]);
+
   // Filtro data dal calendario: { year, month, day|null, iso? } oppure null
   const [dateFilter, setDateFilter] = useState(null);
+
+  // Data "a fuoco" mostrata in alto nell'header, navigabile avanti/indietro
+  const [focusDate, setFocusDate] = useState(todayISO);
+
+  // Finestra modale "Nuovo evento"
+  const [modalOpen, setModalOpen] = useState(false);
 
   const loadLocations = useCallback(async () => {
     try {
@@ -89,6 +117,24 @@ export default function App() {
   const handleToggle = (id) => run(() => api.toggle(id));
   const handleUpdate = (id, fields) => run(() => api.update(id, fields));
 
+  // ---- Filtro priorità: applicato lato client sui risultati già
+  // filtrati dal server, così si possono selezionare più priorità insieme
+  // (es. "alta" e "media") e vedere tutti i casi corrispondenti. ----
+  const visibleTodos = useMemo(() => {
+    if (priorityFilter.length === 0) return todos;
+    return todos.filter((t) => priorityFilter.includes(t.priority || "media"));
+  }, [todos, priorityFilter]);
+
+  // ---- Navigazione data in alto (header): avanti/indietro di un
+  // giorno, o salto diretto a una data scelta. Filtra la lista su quel
+  // singolo giorno. ----
+  const jumpToDate = (iso) => {
+    setFocusDate(iso);
+    setDateFilter({ type: "days", dates: [iso] });
+  };
+  const shiftFocusDate = (delta) => jumpToDate(addDaysISO(focusDate, delta));
+  const goToday = () => jumpToDate(todayISO());
+
   // ---- Eliminazioni con conferma ----
   // confirm = null oppure { title, message, confirmLabel, action }
   const [confirm, setConfirm] = useState(null);
@@ -115,31 +161,51 @@ export default function App() {
     await run(action);
   };
 
-  const activeCount = todos.filter((t) => !t.completed).length;
-  const completedCount = todos.filter((t) => t.completed).length;
+  const activeCount = visibleTodos.filter((t) => !t.completed).length;
+  const completedCount = visibleTodos.filter((t) => t.completed).length;
   const isFiltered =
     filter !== "tutti" ||
     search.trim() !== "" ||
     locationFilter !== "" ||
+    priorityFilter.length > 0 ||
     dateFilter !== null;
+
+  const modalDefaultDate =
+    dateFilter?.type === "days" && dateFilter.dates.length === 1
+      ? dateFilter.dates[0]
+      : focusDate;
 
   return (
     <div className="app">
       <div className="bg-blob blob-a" aria-hidden="true" />
       <div className="bg-blob blob-b" aria-hidden="true" />
 
-      <Header />
+      <Header
+        focusDate={focusDate}
+        onPrevDay={() => shiftFocusDate(-1)}
+        onNextDay={() => shiftFocusDate(1)}
+        onPickDate={jumpToDate}
+        onToday={goToday}
+      />
 
       <div className="board">
         <aside className="side-panel">
-          <AddTodoForm
-            onCreate={handleCreate}
-            defaultDate={
-              dateFilter?.type === "days" && dateFilter.dates.length === 1
-                ? dateFilter.dates[0]
-                : ""
-            }
-          />
+          <section className="panel-card new-event-card">
+            <h2 className="panel-label">Nuova attività</h2>
+            <p className="new-event-hint">
+              Apri una finestra dedicata per aggiungere titolo, priorità, data e
+              luogo di una nuova attività.
+            </p>
+            <button
+              type="button"
+              className="btn btn-primary btn-block"
+              onClick={() => setModalOpen(true)}
+            >
+              <IconPlus />
+              Nuovo evento
+            </button>
+          </section>
+
           <CalendarPanel selected={dateFilter} onSelect={setDateFilter} />
           <ProgressCard
             activeCount={activeCount}
@@ -157,7 +223,11 @@ export default function App() {
             locations={locations}
             locationFilter={locationFilter}
             onLocationFilterChange={setLocationFilter}
+            priorityFilter={priorityFilter}
+            onPriorityFilterChange={setPriorityFilter}
           />
+
+          <StatsPanel todos={visibleTodos} />
 
           {error && (
             <div className="error-banner" role="alert">
@@ -166,7 +236,7 @@ export default function App() {
           )}
 
           <TodoList
-            todos={todos}
+            todos={visibleTodos}
             loading={loading}
             isFiltered={isFiltered}
             onToggle={handleToggle}
@@ -175,6 +245,13 @@ export default function App() {
           />
         </main>
       </div>
+
+      <EventModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onCreate={handleCreate}
+        defaultDate={modalDefaultDate}
+      />
 
       <ConfirmDialog
         open={confirm !== null}
